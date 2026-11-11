@@ -31,3 +31,11 @@ _Кейін қосылады (docs/diagrams/01-usecase.png)._
 ### 2. Class
 
 _Кейін қосылады (docs/diagrams/02-class.png)._
+
+### 3. Activity: Белсенділік статистикасын қарау
+
+![Activity](docs/diagrams/03-activity.png)
+
+### 4. Sequence: Белсенділік статистикасын қарау
+
+_Кейін қосылады (4-жұмыс)._
