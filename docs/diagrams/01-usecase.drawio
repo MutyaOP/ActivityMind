@@ -1,0 +1,76 @@
+<mxfile host="Electron">
+  <diagram name="Use Case" id="d1">
+    <mxGraphModel dx="1697" dy="1023" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="b" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1F3864;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;fontStyle=1;fontSize=14;" value="ProdAI – өнімділікті талдау жүйесі" vertex="1">
+          <mxGeometry height="500" width="560" x="260" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="u1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E4EEFA;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;" value="Өнімділікті талдау" vertex="1">
+          <mxGeometry height="80" width="170" x="300" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="u2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E4EEFA;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;" value="Тапсырма қосу" vertex="1">
+          <mxGeometry height="80" width="170" x="300" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="u3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E4EEFA;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;" value="Есепті көру" vertex="1">
+          <mxGeometry height="80" width="170" x="450" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="u4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E4EEFA;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;" value="Пайдаланушы қосу" vertex="1">
+          <mxGeometry height="80" width="170" x="600" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="u5" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F6C25B;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;" value="Жүйеге кіру" vertex="1">
+          <mxGeometry height="80" width="170" x="450" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;fontSize=13;" value="Қызметкер" vertex="1">
+          <mxGeometry height="80" width="40" x="130" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;fontSize=13;" value="Менеджер" vertex="1">
+          <mxGeometry height="80" width="40" x="910" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#1F3864;strokeWidth=2;fontStyle=1;fontSize=13;" value="Админ&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="40" x="910" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="l0" edge="1" parent="1" source="a1" style="endArrow=none;html=1;strokeColor=#1F3864;strokeWidth=2;" target="u1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l1" edge="1" parent="1" source="a1" style="endArrow=none;html=1;strokeColor=#1F3864;strokeWidth=2;" target="u2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l2" edge="1" parent="1" source="a1" style="endArrow=none;html=1;strokeColor=#1F3864;strokeWidth=2;" target="u3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l3" edge="1" parent="1" source="a2" style="endArrow=none;html=1;strokeColor=#1F3864;strokeWidth=2;" target="u3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l4" edge="1" parent="1" source="a3" style="endArrow=none;html=1;strokeColor=#1F3864;strokeWidth=2;" target="u4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i0" edge="1" parent="1" source="u2" style="endArrow=open;dashed=1;html=1;strokeColor=#2E75B6;strokeWidth=2;fontColor=#2E75B6;" target="u5" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i1" edge="1" parent="1" source="u3" style="endArrow=open;dashed=1;html=1;strokeColor=#2E75B6;strokeWidth=2;fontColor=#2E75B6;" target="u5" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i2" edge="1" parent="1" source="u4" style="endArrow=open;dashed=1;html=1;strokeColor=#2E75B6;strokeWidth=2;fontColor=#2E75B6;" target="u5" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c0bTpHPsVgd-tlghcA6x-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" value="" vertex="1">
+          <mxGeometry height="740" width="700" x="1070" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="c0bTpHPsVgd-tlghcA6x-2" parent="1" style="text;whiteSpace=wrap;html=1;fontSize=19;" value="&lt;p class=&quot;MsoNormal&quot; style=&quot;margin-bottom:6.0pt&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-size: 19.25pt;&quot;&gt;Функционалдық&#xa;талаптар (Ф):&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="90" width="190" x="1080" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="c0bTpHPsVgd-tlghcA6x-3" parent="1" style="text;whiteSpace=wrap;fontSize=19;" value="Ф1. Жүйе қызметкерге тапсырма қосуға және оның орындалу уақытын белгілеуге мүмкіндік беруі керек. &#xa;&#xa;Ф2. Жүйе әр тапсырмаға жұмсалған уақытты есептеп отыруы керек.&#xa;&#xa;Ф3. Жүйе AI модулі арқылы өнімділік көрсеткішін (0–100 балл) есептеуі керек. &#xa;&#xa;Ф4. Жүйе қызметкерге өнімділік графигін апта және ай бойынша көрсетуі керек.&#xa;&#xa;Ф5. Жүйе өнімділікті жақсарту бойынша AI ұсыныстарын қалыптастыруы керек. &#xa;&#xa;Ф6. Жүйе менеджерге команда мүшелерінің өнімділік есебін көруге мүмкіндік беруі керек. &#xa;&#xa;Ф7. Жүйе әкімшіге жаңа пайдаланушы қосуға және оған рөл тағайындауға мүмкіндік беруі керек." vertex="1">
+          <mxGeometry height="460" width="660" x="1075" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="c0bTpHPsVgd-tlghcA6x-4" parent="1" style="text;whiteSpace=wrap;fontSize=19;" value="ФЕ1. Өнімділікті талдау нәтижесі 5 секундтан аспай көрсетілуі керек. &#xa;&#xa;ФЕ2. Деректерге тек логин мен пароль арқылы кіруге болады, пароль шифрланып сақталады. &#xa;&#xa;ФЕ3. Интерфейс телефонда (экран ені 360 px-тен бастап) және компьютерде дұрыс көрінуі керек." vertex="1">
+          <mxGeometry height="190" width="640" x="1070" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="c0bTpHPsVgd-tlghcA6x-5" parent="1" style="text;whiteSpace=wrap;html=1;fontSize=17;" value="&lt;p class=&quot;MsoNormal&quot; style=&quot;margin-bottom:6.0pt&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-size: 17.75pt;&quot;&gt;Функционалдық&#xa;емес талаптар (ФЕ):&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="90" width="670" x="1070" y="520" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
