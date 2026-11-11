@@ -42,11 +42,11 @@
 
 ### 1. Use Case
 
-![Use_Case] (docs/diagrams/01-usecase.png)._x
+![Use_Case](docs/diagrams/01-usecase.png)
 
 ### 2. Class
 
-![Class] (docs/diagrams/02-class.png)._
+![Class](docs/diagrams/02-class.png)
 
 ### 3. Activity: Белсенділік статистикасын қарау
 
