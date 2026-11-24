@@ -1,26 +1,21 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark">
+<html lang="{{ app()->getLocale() }}" data-theme="{{ ($theme ?? 'dark') === 'light' ? 'light' : 'dark' }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ isset($header) ? trim(strip_tags($header)) . ' · ' : '' }}ActivityMind</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=ibm-plex-sans:400,500,600|jetbrains-mono:400,500&display=swap" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.partials.head', ['title' => (isset($header) ? trim(strip_tags($header)).' · ' : '').'ActivityMind'])
 </head>
 <body class="min-h-screen">
 @php
     $user = auth()->user();
     $nav = [
-        ['Дашборд',      'dashboard',             'home'],
-        ['Задачи',       'tasks.index',           'check'],
-        ['Таймер',       'timer.index',           'timer'],
-        ['Привычки',     'habits.index',          'repeat'],
-        ['Аналитика',    'analytics.index',       'chart'],
-        ['Активность',   'activity.index',        'clock'],
-        ['Рекомендации', 'recommendations.index', 'bulb'],
-        ['Устройства',   'devices.index',         'device'],
+        [__('Дашборд'),      'dashboard',             'home'],
+        [__('Задачи'),       'tasks.index',           'check'],
+        [__('Таймер'),       'timer.index',           'timer'],
+        [__('Привычки'),     'habits.index',          'repeat'],
+        [__('Аналитика'),    'analytics.index',       'chart'],
+        [__('Активность'),   'activity.index',        'clock'],
+        [__('Рекомендации'), 'recommendations.index', 'bulb'],
+        [__('Устройства'), 'devices.index',         'device'],
+        [__('Настройки'),  'settings.edit',         'sliders'],
     ];
     $unreadCount  = $user->recommendations()->where('is_read', false)->count();
     $timerRunning = $user->timeEntries()->running()->exists();
@@ -48,7 +43,7 @@
                     <x-icon :name="$icon" class="h-[18px] w-[18px] shrink-0 {{ $isActive($route) ? 'text-slate-200' : 'text-slate-500 group-hover:text-slate-300' }}" />
                     <span class="flex-1">{{ $label }}</span>
                     @if ($route === 'timer.index' && $timerRunning)
-                        <span class="am-rec" title="Таймер идёт"></span>
+                        <span class="am-rec" title="{{ __('Таймер идёт') }}"></span>
                     @endif
                     @if ($route === 'recommendations.index' && $unreadCount > 0)
                         <span class="am-num text-xs text-slate-500">{{ $unreadCount }}</span>
@@ -57,12 +52,12 @@
             @endforeach
 
             @if ($user->isAdmin())
-                <div class="px-2.5 pb-2 pt-6 text-xs text-slate-500">Администрирование</div>
+                <div class="px-2.5 pb-2 pt-6 text-xs text-slate-500">{{ __('Администрирование') }}</div>
                 <a href="{{ route('admin.dashboard') }}" class="{{ $linkBase }} {{ request()->routeIs('admin.dashboard') ? $linkOn : $linkOff }}">
-                    <x-icon name="shield" class="h-[18px] w-[18px] shrink-0 text-slate-500" /> Обзор
+                    <x-icon name="shield" class="h-[18px] w-[18px] shrink-0 text-slate-500" /> {{ __('Обзор') }}
                 </a>
                 <a href="{{ route('admin.users.index') }}" class="{{ $linkBase }} {{ request()->routeIs('admin.users.*') ? $linkOn : $linkOff }}">
-                    <x-icon name="users" class="h-[18px] w-[18px] shrink-0 text-slate-500" /> Пользователи
+                    <x-icon name="users" class="h-[18px] w-[18px] shrink-0 text-slate-500" /> {{ __('Пользователи') }}
                 </a>
             @endif
         </nav>
@@ -75,12 +70,12 @@
                 </span>
                 <span class="min-w-0">
                     <span class="block truncate text-sm text-slate-100">{{ $user->name }}</span>
-                    <span class="block truncate text-xs text-slate-500">{{ $user->isAdmin() ? 'Администратор' : 'Профиль' }}</span>
+                    <span class="block truncate text-xs text-slate-500">{{ $user->isAdmin() ? __('Администратор') : __('Профиль') }}</span>
                 </span>
             </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-white/[0.06] hover:text-slate-100" title="Выйти" aria-label="Выйти">
+                <button class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-white/[0.06] hover:text-slate-100" title="{{ __('Выйти') }}" aria-label="{{ __('Выйти') }}">
                     <x-icon name="logout" class="h-4 w-4" />
                 </button>
             </form>
@@ -91,7 +86,7 @@
         {{-- Верхняя панель --}}
         <header class="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-white/[0.06] bg-surface-900 px-4 md:px-8">
             <div class="flex items-center gap-3">
-                <button @click="open = !open" class="grid h-8 w-8 place-items-center rounded-lg text-slate-300 hover:bg-white/[0.06] md:hidden" aria-label="Меню">
+                <button @click="open = !open" class="grid h-8 w-8 place-items-center rounded-lg text-slate-300 hover:bg-white/[0.06] md:hidden" aria-label="{{ __('Меню') }}">
                     <x-icon name="menu" />
                 </button>
                 @isset($header)
@@ -99,7 +94,7 @@
                 @endisset
             </div>
             <div class="hidden text-sm text-slate-500 sm:block">
-                {{ \Illuminate\Support\Str::ucfirst(now()->setTimezone($user->timezone ?: config('app.timezone'))->locale('ru')->isoFormat('dddd, D MMMM')) }}
+                {{ \Illuminate\Support\Str::ucfirst(now()->setTimezone($user->timezone ?: config('app.timezone'))->locale(app()->getLocale())->isoFormat('dddd, D MMMM')) }}
             </div>
         </header>
 
@@ -109,7 +104,7 @@
                      class="mb-6 flex items-center gap-3 rounded-xl border border-white/[0.07] bg-surface-800 px-4 py-3 text-sm text-slate-200">
                     <x-icon name="tick" class="h-4 w-4 shrink-0 text-[#4cc38a]" />
                     <span class="flex-1">{{ session('status') }}</span>
-                    <button type="button" @click="show = false" class="grid h-6 w-6 place-items-center rounded text-slate-500 hover:text-slate-200" aria-label="Закрыть">
+                    <button type="button" @click="show = false" class="grid h-6 w-6 place-items-center rounded text-slate-500 hover:text-slate-200" aria-label="{{ __('Закрыть') }}">
                         <x-icon name="x" class="h-4 w-4" />
                     </button>
                 </div>

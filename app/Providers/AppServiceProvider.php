@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Ключи переводов — русские строки, поэтому запасной язык всегда русский:
+        // иначе при отсутствии ключа в kk.json подставлялся бы английский текст.
+        $this->app['translator']->setFallback('ru');
     }
 }

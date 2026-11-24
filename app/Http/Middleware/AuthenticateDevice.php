@@ -23,7 +23,7 @@ class AuthenticateDevice
             : null;
 
         if (! $device) {
-            return response()->json(['message' => 'Неверный или отсутствующий токен устройства.'], 401);
+            return response()->json(['message' => __('Неверный или отсутствующий токен устройства.')], 401);
         }
 
         $request->attributes->set('device', $device);

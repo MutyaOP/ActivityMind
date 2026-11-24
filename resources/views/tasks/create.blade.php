@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">Новая задача</x-slot>
+    <x-slot name="header">{{ __('Новая задача') }}</x-slot>
 
     <form method="POST" action="{{ route('tasks.store') }}" class="am-card max-w-3xl">
         @csrf

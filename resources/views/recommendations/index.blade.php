@@ -1,33 +1,33 @@
 @php
     $types = [
-        'focus'    => ['Фокус',         'am-badge am-badge-brand'],
-        'break'    => ['Отдых',         'am-badge am-badge-teal'],
-        'habit'    => ['Привычки',      'am-badge am-badge-amber'],
-        'planning' => ['Планирование',  'am-badge am-badge-sky'],
-        'other'    => ['Другое',        'am-badge am-badge-slate'],
+        'focus'    => [__('Фокус'),         'am-badge am-badge-brand'],
+        'break'    => [__('Отдых'),         'am-badge am-badge-teal'],
+        'habit'    => [__('Привычки'),      'am-badge am-badge-amber'],
+        'planning' => [__('Планирование'),  'am-badge am-badge-sky'],
+        'other'    => [__('Другое'),        'am-badge am-badge-slate'],
     ];
-    $sources = ['rule' => 'по правилам', 'ai' => 'AI-анализ'];
+    $sources = ['rule' => __('по правилам'), 'ai' => __('AI-анализ')];
     $onlyUnread = request('filter') === 'unread';
 @endphp
 
 <x-app-layout>
-    <x-slot name="header">Рекомендации</x-slot>
+    <x-slot name="header">{{ __('Рекомендации') }}</x-slot>
 
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
             <div class="am-tabs">
             <a href="{{ request()->fullUrlWithQuery(['filter' => null, 'page' => null]) }}"
-               class="am-tab {{ ! $onlyUnread ? 'am-tab-active' : '' }}">Все</a>
+               class="am-tab {{ ! $onlyUnread ? 'am-tab-active' : '' }}">{{ __('Все') }}</a>
             <a href="{{ request()->fullUrlWithQuery(['filter' => 'unread', 'page' => null]) }}"
                class="am-tab {{ $onlyUnread ? 'am-tab-active' : '' }}">
-                Новые <span class="ml-1 text-xs opacity-70">{{ $unread }}</span>
+                {{ __('Новые') }} <span class="ml-1 text-xs opacity-70">{{ $unread }}</span>
             </a>
             </div>
 
             <form method="GET" class="ml-2">
                 @if ($onlyUnread) <input type="hidden" name="filter" value="unread"> @endif
                 <select name="type" onchange="this.form.submit()" class="am-input !w-auto !py-1.5 text-sm ">
-                    <option value="">Все темы</option>
+                    <option value="">{{ __('Все темы') }}</option>
                     @foreach ($types as $key => [$label])
                         <option value="{{ $key }}" @selected(request('type') === $key)>{{ $label }}</option>
                     @endforeach
@@ -39,12 +39,12 @@
             @if ($unread > 0)
                 <form method="POST" action="{{ route('recommendations.readAll') }}">
                     @csrf
-                    <button class="am-btn-outline">Прочитать все</button>
+                    <button class="am-btn-outline">{{ __('Прочитать все') }}</button>
                 </form>
             @endif
             <form method="POST" action="{{ route('recommendations.generate') }}">
                 @csrf
-                <button class="am-btn"><x-icon name="refresh" class="h-4 w-4" />Обновить советы</button>
+                <button class="am-btn"><x-icon name="refresh" class="h-4 w-4" />{{ __('Обновить советы') }}</button>
             </form>
         </div>
     </div>
@@ -58,7 +58,7 @@
                         <span class="{{ $typeStyle }}">{{ $typeLabel }}</span>
                         <span class="text-slate-500">{{ $sources[$rec->source] ?? $rec->source }}</span>
                         <span class="text-slate-500">· {{ $rec->created_at->copy()->setTimezone(auth()->user()->timezone ?: config('app.timezone'))->format('d.m.Y H:i') }}</span>
-                        @unless ($rec->is_read) <span class="am-badge am-badge-brand">новая</span> @endunless
+                        @unless ($rec->is_read) <span class="am-badge am-badge-brand">{{ __('новая') }}</span> @endunless
                     </div>
                     <p class="text-slate-200">{{ $rec->text }}</p>
                 </div>
@@ -67,21 +67,21 @@
                     @unless ($rec->is_read)
                         <form method="POST" action="{{ route('recommendations.read', $rec) }}">
                             @csrf @method('PATCH')
-                            <button class="am-btn-ghost"><x-icon name="tick" class="h-3.5 w-3.5" />Прочитано</button>
+                            <button class="am-btn-ghost"><x-icon name="tick" class="h-3.5 w-3.5" />{{ __('Прочитано') }}</button>
                         </form>
                     @endunless
-                    <form method="POST" action="{{ route('recommendations.destroy', $rec) }}" onsubmit="return confirm('Удалить рекомендацию?')">
+                    <form method="POST" action="{{ route('recommendations.destroy', $rec) }}" onsubmit="return confirm(@js(__('Удалить рекомендацию?')))">
                         @csrf @method('DELETE')
-                        <button class="am-btn-danger" title="Удалить"><x-icon name="trash" class="h-4 w-4" /></button>
+                        <button class="am-btn-danger" title="{{ __('Удалить') }}"><x-icon name="trash" class="h-4 w-4" /></button>
                     </form>
                 </div>
             </div>
         @empty
             <div class="am-card am-empty">
                 @if ($onlyUnread || request('type'))
-                    Ничего не найдено. <a href="{{ route('recommendations.index') }}" class="am-link">Сбросить фильтры</a>
+                    {{ __('Ничего не найдено.') }} <a href="{{ route('recommendations.index') }}" class="am-link">{{ __('Сбросить фильтры') }}</a>
                 @else
-                    Рекомендаций пока нет. Нажмите «Обновить советы» — они появляются, когда накапливается история задач, времени и привычек.
+                    {{ __('Рекомендаций пока нет. Нажмите «Обновить советы» — они появляются, когда накапливается история задач, времени и привычек.') }}
                 @endif
             </div>
         @endforelse

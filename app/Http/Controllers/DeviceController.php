@@ -49,6 +49,6 @@ class DeviceController extends Controller
 
         $device->delete(); // история активности устройства удаляется каскадом
 
-        return back()->with('status', 'Устройство удалено вместе с собранной активностью.');
+        return back()->with('status', __('Устройство удалено вместе с собранной активностью.'));
     }
 }

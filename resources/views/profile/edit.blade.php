@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">Профиль</x-slot>
+    <x-slot name="header">{{ __('Профиль') }}</x-slot>
 
     <div>
         <div class="max-w-3xl space-y-6">

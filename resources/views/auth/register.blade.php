@@ -1,6 +1,6 @@
 <x-guest-layout>
-    <h1 class="mb-1 text-2xl">Регистрация</h1>
-    <p class="mb-8 text-sm text-slate-400">Аккаунт для учёта времени, задач и привычек</p>
+    <h1 class="mb-1 text-2xl">{{ __('Регистрация') }}</h1>
+    <p class="mb-8 text-sm text-slate-400">{{ __('Аккаунт для учёта времени, задач и привычек') }}</p>
     <form method="POST" action="{{ route('register') }}">
         @csrf
 

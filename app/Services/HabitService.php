@@ -52,7 +52,7 @@ class HabitService
             $key = $day->toDateString();
             $week[] = [
                 'date'     => $key,
-                'label'    => $day->copy()->locale('ru')->isoFormat('dd'),
+                'label'    => $day->copy()->locale(app()->getLocale())->isoFormat('dd'),
                 'day'      => $day->day,
                 'done'     => isset($set[$key]),
                 'is_today' => $i === 0,
@@ -62,7 +62,7 @@ class HabitService
         return [
             'current_streak' => $current,
             'best_streak'    => $best,
-            'unit'           => $habit->frequency === 'weekly' ? 'нед.' : 'дн.',
+            'unit'           => $habit->frequency === 'weekly' ? __('нед.') : __('дн.'),
             'rate'           => $this->rate($habit, $dates, $today, $tz),
             'week'           => $week,
         ];

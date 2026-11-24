@@ -39,8 +39,8 @@ class RecommendationController extends Controller
         $created = $service->generate($request->user());
 
         return back()->with('status', $created > 0
-            ? "Новых рекомендаций: {$created}."
-            : 'Пока нечего добавить: новых поводов для советов нет.');
+            ? __('Новых рекомендаций: :count.', ['count' => $created])
+            : __('Пока нечего добавить: новых поводов для советов нет.'));
     }
 
     public function read(Recommendation $recommendation)
@@ -56,7 +56,7 @@ class RecommendationController extends Controller
     {
         Recommendation::where('user_id', $request->user()->id)->where('is_read', false)->update(['is_read' => true]);
 
-        return back()->with('status', 'Все рекомендации отмечены прочитанными.');
+        return back()->with('status', __('Все рекомендации отмечены прочитанными.'));
     }
 
     public function destroy(Recommendation $recommendation)
@@ -65,6 +65,6 @@ class RecommendationController extends Controller
 
         $recommendation->delete();
 
-        return back()->with('status', 'Рекомендация удалена.');
+        return back()->with('status', __('Рекомендация удалена.'));
     }
 }

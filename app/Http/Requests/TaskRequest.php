@@ -31,13 +31,13 @@ class TaskRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title'         => 'название',
-            'description'   => 'описание',
-            'category_id'   => 'категория',
-            'priority'      => 'приоритет',
-            'status'        => 'статус',
-            'due_date'      => 'срок',
-            'estimated_min' => 'оценка времени',
+            'title'         => __('название'),
+            'description'   => __('описание'),
+            'category_id'   => __('категория'),
+            'priority'      => __('приоритет'),
+            'status'        => __('статус'),
+            'due_date'      => __('срок'),
+            'estimated_min' => __('оценка времени'),
         ];
     }
 }

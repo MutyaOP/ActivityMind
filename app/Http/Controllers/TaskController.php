@@ -63,7 +63,7 @@ class TaskController extends Controller
 
         Task::create($data);
 
-        return redirect()->route('tasks.index')->with('status', 'Задача создана.');
+        return redirect()->route('tasks.index')->with('status', __('Задача создана.'));
     }
 
     public function edit(Request $request, Task $task)
@@ -85,7 +85,7 @@ class TaskController extends Controller
 
         $task->update($data);
 
-        return redirect()->route('tasks.index')->with('status', 'Задача обновлена.');
+        return redirect()->route('tasks.index')->with('status', __('Задача обновлена.'));
     }
 
     public function destroy(Task $task)
@@ -94,7 +94,7 @@ class TaskController extends Controller
 
         $task->delete();
 
-        return back()->with('status', 'Задача удалена.');
+        return back()->with('status', __('Задача удалена.'));
     }
 
     /** Быстрое «выполнено / вернуть в работу». */
@@ -108,7 +108,7 @@ class TaskController extends Controller
             'completed_at' => $done ? null : now(),
         ]);
 
-        return back()->with('status', $done ? 'Задача возвращена в работу.' : 'Задача выполнена.');
+        return back()->with('status', $done ? __('Задача возвращена в работу.') : __('Задача выполнена.'));
     }
 
     private function categoriesFor(int $userId)

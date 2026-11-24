@@ -1,6 +1,6 @@
 <x-guest-layout>
-    <h1 class="mb-1 text-2xl">Вход</h1>
-    <p class="mb-8 text-sm text-slate-400">Ваши задачи, таймер и статистика</p>
+    <h1 class="mb-1 text-2xl">{{ __('Вход') }}</h1>
+    <p class="mb-8 text-sm text-slate-400">{{ __('Ваши задачи, таймер и статистика') }}</p>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 

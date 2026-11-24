@@ -52,7 +52,7 @@ class TimerController extends Controller
 
         $timer->start($request->user(), $data['task_id'] ?? null, $data['category_id'] ?? null, $data['note'] ?? null);
 
-        return redirect()->route('timer.index')->with('status', 'Таймер запущен.');
+        return redirect()->route('timer.index')->with('status', __('Таймер запущен.'));
     }
 
     public function stop(Request $request, TimerService $timer)
@@ -62,8 +62,8 @@ class TimerController extends Controller
         return redirect()->route('timer.index')->with(
             'status',
             $stopped
-                ? 'Записано: '.AnalyticsService::humanDuration((int) $stopped->duration_sec).'.'
-                : 'Таймер не был запущен.'
+                ? __('Записано: :time.', ['time' => AnalyticsService::humanDuration((int) $stopped->duration_sec)])
+                : __('Таймер не был запущен.')
         );
     }
 
@@ -79,12 +79,12 @@ class TimerController extends Controller
         $seconds = \Carbon\Carbon::parse($data['ended_at'], $tz)->diffInSeconds(\Carbon\Carbon::parse($data['started_at'], $tz));
 
         if ($seconds > 86400) {
-            throw ValidationException::withMessages(['ended_at' => 'Запись не может быть длиннее 24 часов.']);
+            throw ValidationException::withMessages(['ended_at' => __('Запись не может быть длиннее 24 часов.')]);
         }
 
         $timer->addManual($user, $data['started_at'], $data['ended_at'], $data['task_id'] ?? null, $data['category_id'] ?? null, $data['note'] ?? null);
 
-        return redirect()->route('timer.index')->with('status', 'Запись добавлена.');
+        return redirect()->route('timer.index')->with('status', __('Запись добавлена.'));
     }
 
     public function destroy(TimeEntry $entry)
@@ -93,7 +93,7 @@ class TimerController extends Controller
 
         $entry->delete();
 
-        return back()->with('status', 'Запись удалена.');
+        return back()->with('status', __('Запись удалена.'));
     }
 
     private function validateEntryFields(Request $request): array

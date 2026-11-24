@@ -35,7 +35,7 @@ class HabitController extends Controller
     {
         Habit::create($this->payload($request) + ['user_id' => $request->user()->id]);
 
-        return redirect()->route('habits.index')->with('status', 'Привычка добавлена.');
+        return redirect()->route('habits.index')->with('status', __('Привычка добавлена.'));
     }
 
     public function edit(Habit $habit)
@@ -51,7 +51,7 @@ class HabitController extends Controller
 
         $habit->update($this->payload($request));
 
-        return redirect()->route('habits.index')->with('status', 'Привычка обновлена.');
+        return redirect()->route('habits.index')->with('status', __('Привычка обновлена.'));
     }
 
     public function destroy(Habit $habit)
@@ -60,7 +60,7 @@ class HabitController extends Controller
 
         $habit->delete();
 
-        return redirect()->route('habits.index')->with('status', 'Привычка удалена вместе с историей.');
+        return redirect()->route('habits.index')->with('status', __('Привычка удалена вместе с историей.'));
     }
 
     /** Отметка за сегодня или за любой из последних 30 дней. */
@@ -74,7 +74,7 @@ class HabitController extends Controller
         $today = now($tz)->toDateString();
         $date = $data['date'] ?? $today;
 
-        abort_if($date > $today || $date < now($tz)->subDays(30)->toDateString(), 422, 'Недопустимая дата.');
+        abort_if($date > $today || $date < now($tz)->subDays(30)->toDateString(), 422, __('Недопустимая дата.'));
 
         $service->toggle($habit, $date);
 

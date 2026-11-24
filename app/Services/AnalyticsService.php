@@ -71,7 +71,7 @@ class AnalyticsService
             $habitsDone = (int) ($habitsByDay[$key] ?? 0);
             $score = $this->score($focusSec, $goalMin, $tasksDone, $habitsDone, $habitsTotal);
 
-            $labels[] = $day->copy()->locale('ru')->isoFormat('dd D');
+            $labels[] = $day->copy()->locale(app()->getLocale())->isoFormat('dd D');
             $focusHours[] = round($focusSec / 3600, 2);
             $scores[] = $score;
             $weekFocusSec += $focusSec;
@@ -96,7 +96,7 @@ class AnalyticsService
         $catColors = [];
         foreach ($entries->groupBy(fn (TimeEntry $e) => $e->category_id ?? 0) as $group) {
             $first = $group->first();
-            $catLabels[] = $first->category?->name ?? 'Без категории';
+            $catLabels[] = __($first->category?->name ?? 'Без категории');
             $catColors[] = $first->category?->color ?? '#64748b';
             $catHours[] = round($group->sum(fn (TimeEntry $e) => $this->seconds($e)) / 3600, 2);
         }
@@ -177,7 +177,7 @@ class AnalyticsService
         $h = intdiv($sec, 3600);
         $m = intdiv($sec % 3600, 60);
 
-        return $h > 0 ? "{$h} ч {$m} мин" : "{$m} мин";
+        return $h > 0 ? $h.' '.__('ч').' '.$m.' '.__('мин') : $m.' '.__('мин');
     }
 
     private function seconds(TimeEntry $e): int
@@ -194,10 +194,10 @@ class AnalyticsService
     private function greeting(Carbon $now): string
     {
         return match (true) {
-            $now->hour < 5  => 'Доброй ночи',
-            $now->hour < 12 => 'Доброе утро',
-            $now->hour < 18 => 'Добрый день',
-            default         => 'Добрый вечер',
+            $now->hour < 5  => __('Доброй ночи'),
+            $now->hour < 12 => __('Доброе утро'),
+            $now->hour < 18 => __('Добрый день'),
+            default         => __('Добрый вечер'),
         };
     }
 }

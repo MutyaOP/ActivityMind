@@ -37,7 +37,7 @@ class ActivityDayService
     {
         $key = self::appKey($app);
 
-        return self::APP_NAMES[$key] ?? preg_replace('/\.exe$/i', '', trim($app));
+        return isset(self::APP_NAMES[$key]) ? __(self::APP_NAMES[$key]) : preg_replace('/\.exe$/i', '', trim($app));
     }
 
     public function day(User $user, CarbonImmutable $date, bool $withTabs = false): array
@@ -129,7 +129,7 @@ class ActivityDayService
 
                 return [
                     'name'       => self::appLabel($group->first()->app_name),
-                    'category'   => $main->category?->name ?? 'Без категории',
+                    'category'   => __($main->category?->name ?? 'Без категории'),
                     'color'      => $main->category?->color ?? self::NO_CATEGORY_COLOR,
                     'sec'        => $sec,
                     'label'      => AnalyticsService::humanDuration($sec),
@@ -151,7 +151,7 @@ class ActivityDayService
                 $cat = $group->first()->category;
 
                 return [
-                    'name'  => $cat?->name ?? 'Без категории',
+                    'name'  => __($cat?->name ?? 'Без категории'),
                     'color' => $cat?->color ?? self::NO_CATEGORY_COLOR,
                     'sec'   => $sec,
                     'label' => AnalyticsService::humanDuration($sec),
@@ -175,7 +175,7 @@ class ActivityDayService
                 return [
                     'title'    => $first->window_title,
                     'browser'  => self::appLabel($first->app_name),
-                    'category' => $first->category?->name ?? 'Прочее',
+                    'category' => __($first->category?->name ?? 'Прочее'),
                     'color'    => $first->category?->color ?? self::NO_CATEGORY_COLOR,
                     'sec'      => $sec,
                     'label'    => AnalyticsService::humanDuration($sec),
@@ -212,7 +212,7 @@ class ActivityDayService
                 continue;
             }
             $merged[] = [
-                'cat' => $cat?->id ?? 0, 'name' => $cat?->name ?? 'Без категории',
+                'cat' => $cat?->id ?? 0, 'name' => __($cat?->name ?? 'Без категории'),
                 'color' => $cat?->color ?? self::NO_CATEGORY_COLOR,
                 'from' => $from, 'to' => $to, 'apps' => [self::appLabel($log->app_name) => true],
             ];

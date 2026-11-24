@@ -25,10 +25,10 @@ class HabitRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title'             => 'название',
-            'frequency'         => 'периодичность',
-            'target_per_period' => 'раз в неделю',
-            'color'             => 'цвет',
+            'title'             => __('название'),
+            'frequency'         => __('периодичность'),
+            'target_per_period' => __('раз в неделю'),
+            'color'             => __('цвет'),
         ];
     }
 }

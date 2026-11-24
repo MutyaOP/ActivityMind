@@ -209,7 +209,7 @@ class StatsService
         $catLabels = $catHours = $catColors = [];
         foreach ($entries->groupBy(fn (TimeEntry $e) => $e->category_id ?? 0) as $group) {
             $first = $group->first();
-            $catLabels[] = $first->category?->name ?? 'Без категории';
+            $catLabels[] = __($first->category?->name ?? 'Без категории');
             $catColors[] = $first->category?->color ?? '#64748b';
             $catHours[] = round($group->sum(fn (TimeEntry $e) => $this->seconds($e)) / 3600, 2);
         }
@@ -250,7 +250,7 @@ class StatsService
             ],
             'daily'      => ['labels' => $labels, 'focus' => $focus, 'scores' => $scores, 'tasks' => $tasks],
             'hours'      => $hours,
-            'weekdays'   => ['labels' => self::WEEKDAYS_SHORT, 'avg' => $weekdayAvg],
+            'weekdays'   => ['labels' => array_map(fn ($d) => __($d), self::WEEKDAYS_SHORT), 'avg' => $weekdayAvg],
             'categories' => ['labels' => $catLabels, 'hours' => $catHours, 'colors' => $catColors],
             'apps'       => ['labels' => $apps->keys()->values()->all(), 'hours' => $apps->values()->all()],
             'insights'   => $this->insights($focusTotal, $hours, $weekdayAvg, $trend, $goalDays, $days, $goalMin),
@@ -260,27 +260,28 @@ class StatsService
     private function insights(int $focusTotal, array $hours, array $weekdayAvg, ?int $trend, int $goalDays, int $days, int $goalMin): array
     {
         if ($focusTotal === 0) {
-            return ['Пока недостаточно данных: запустите таймер на странице «Таймер», и здесь появятся выводы.'];
+            return [__('Пока недостаточно данных: запустите таймер на странице «Таймер», и здесь появятся выводы.')];
         }
 
         $out = [];
 
         $bestHour = array_search(max($hours), $hours, true);
-        $out[] = sprintf('Чаще всего вы работаете с %02d:00 до %02d:00 (по времени начала сессий).', $bestHour, ($bestHour + 1) % 24);
+        $out[] = __('Чаще всего вы работаете с :from до :to (по времени начала сессий).', ['from' => sprintf('%02d:00', $bestHour), 'to' => sprintf('%02d:00', ($bestHour + 1) % 24)]);
 
         $bestWd = array_search(max($weekdayAvg), $weekdayAvg, true);
         if (max($weekdayAvg) > 0) {
-            $out[] = sprintf('Самый продуктивный день недели — %s: в среднем %s фокуса.',
-                self::WEEKDAYS_FULL[$bestWd], AnalyticsService::humanDuration((int) round($weekdayAvg[$bestWd] * 3600)));
+            $out[] = __('Самый продуктивный день недели — :day: в среднем :time фокуса.', [
+                'day' => __(self::WEEKDAYS_FULL[$bestWd]), 'time' => AnalyticsService::humanDuration((int) round($weekdayAvg[$bestWd] * 3600)),
+            ]);
         }
 
         if ($trend !== null) {
             $out[] = $trend >= 0
-                ? "Фокус вырос на {$trend}% по сравнению с предыдущими {$days} днями."
-                : 'Фокус снизился на '.abs($trend)."% по сравнению с предыдущими {$days} днями.";
+                ? __('Фокус вырос на :pct% по сравнению с предыдущими :days днями.', ['pct' => $trend, 'days' => $days])
+                : __('Фокус снизился на :pct% по сравнению с предыдущими :days днями.', ['pct' => abs($trend), 'days' => $days]);
         }
 
-        $out[] = "Цель по фокусу ({$goalMin} мин) выполнена в {$goalDays} из {$days} дней.";
+        $out[] = __('Цель по фокусу (:min мин) выполнена в :n из :days дней.', ['min' => $goalMin, 'n' => $goalDays, 'days' => $days]);
 
         return $out;
     }

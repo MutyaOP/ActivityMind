@@ -41,6 +41,11 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        // язык и тема, выбранные на странице регистрации, переходят в профиль
+        $user->forceFill([
+            'locale' => \App\Support\Preferences::locale($request),
+            'theme'  => \App\Support\Preferences::theme($request),
+        ])->save();
 
         event(new Registered($user));
 
