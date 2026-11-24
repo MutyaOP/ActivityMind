@@ -47,7 +47,23 @@
         </div>
 
         {{-- Правая часть: форма --}}
-        <div class="flex flex-col items-center justify-center px-4 py-12">
+        <div class="relative flex flex-col items-center justify-center px-4 pb-12 pt-24 lg:pt-12">
+            {{-- Переключатель «Вход / Регистрация» в правом верхнем углу --}}
+            <nav class="absolute right-4 top-4 flex items-center gap-1 sm:right-8 sm:top-8" aria-label="Вход и регистрация">
+                <a href="{{ route('login') }}"
+                   @if (request()->routeIs('login')) aria-current="page" @endif
+                   class="inline-flex h-9 items-center rounded-lg px-3.5 text-sm transition-colors {{ request()->routeIs('login') ? 'bg-surface-700 text-slate-100' : 'text-slate-400 hover:bg-white/[0.06] hover:text-slate-100' }}">
+                    Войти
+                </a>
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}"
+                       @if (request()->routeIs('register')) aria-current="page" @endif
+                       class="inline-flex h-9 items-center rounded-lg px-3.5 text-sm transition-colors {{ request()->routeIs('register') ? 'bg-surface-700 text-slate-100' : 'border border-white/[0.12] text-slate-200 hover:bg-white/[0.06] hover:text-slate-100' }}">
+                        Зарегистрироваться
+                    </a>
+                @endif
+            </nav>
+
             <a href="/" class="mb-8 flex items-center gap-2.5 text-lg font-medium text-slate-100 lg:hidden">
                 <x-application-logo /> ActivityMind
             </a>
