@@ -1,58 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ActivityMind
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Автор: Муталипов Алихан, ВТК-24-1Б
 
-## About Laravel
+## Мәселе
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Компьютерде жұмыс істегенде көп адам уақытының қайда кетіп жатқанын нақты білмейді, сондықтан өнімділігін бағалап, жақсарта алмайды. ActivityMind — компьютердегі белсенділікті автоматты түрде бақылайтын (Desktop Agent), оны жасанды интеллект арқылы талдайтын және жеке ұсыныстар беретін гибридті жүйе (веб-платформа). Жүйе студенттерге, бағдарламашыларға, фрилансерлерге және офис қызметкерлеріне уақытын бақылауға көмектеседі.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Акторлар
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Пайдаланушы
+- Админ
+- Desktop Agent (сыртқы жүйе)
+- AI Analyzer (сыртқы жүйе)
 
-## Learning Laravel
+## Талаптар
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Функционалдық
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Жүйе пайдаланушының белсенді қолданбалары мен терезелерін автоматты түрде бақылауы керек.
+2. Жүйе әр қолданбаны пайдалану ұзақтығын және бос тұрған (әрекетсіз) кезеңдерді есептеуі керек.
+3. Жүйе қолданбаларды категорияларға (жұмыс, оқу, бағдарламалау, қарым-қатынас, ойын-сауық) бөлуі және пайдаланушыға категорияны өзгертуге мүмкіндік беруі керек.
+4. Жүйе өнімді белсенділік пен ойын-сауық қатынасын, қолданбалар арасында ауысу жиілігін талдауы керек.
+5. AI-модуль күн, апта және ай бойынша өнімділікті бағалап, есеп пен ұсыныстар қалыптастыруы керек.
+6. Жүйе күндік, апталық және айлық статистика мен графиктерді көрсетуі керек.
+7. Жүйе есепті PDF немесе Excel форматына экспорттауға мүмкіндік беруі керек.
+8. Жүйе пайдаланушыға мақсат қоюға және жоспарланған уақытты нақты уақытпен салыстыруға мүмкіндік беруі керек.
+9. Жүйе пайдаланушыға мониторингті тоқтатып, қайта жалғастыруға мүмкіндік беруі керек.
+10. Әкімші пайдаланушыларды, қолданба категорияларын және жүйе параметрлерін басқара алуы керек.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Функционалдық емес
 
-## Agentic Development
+1. Өнімділік: негізгі беттер қалыпты байланыста 3 секундтан артық жүктелмеуі керек.
+2. Қауіпсіздік: құпиясөздер мен дербес деректер қорғалуы керек.
+3. Сенімділік: Desktop Agent интернет болмаса да деректерді сақтап (SQLite), кейін серверге синхрондауы керек.
+4. Ыңғайлылық: интерфейс техникалық білімі жоқ пайдаланушыға түсінікті болуы керек.
+5. Масштабталу: архитектура пайдаланушылар санының өсуін қолдауы керек.
+6. Үйлесімділік: веб-платформа заманауи браузерлерде, Desktop Agent Windows-та жұмыс істеуі керек.
+7. Құпиялылық: жүйе пернетақта басуларын, құпиясөздерді, жеке хабарламалар мен құжат мазмұнын жазбауы керек; пайдаланушы мониторинг пен деректерін өзі басқара алуы керек.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Диаграммалар
+
+### 1. Use Case
+
+![Use Case](docs/diagrams/01-usecase.png)
+
+### 2. Class
+
+![Class](docs/diagrams/02-class.png)
+
+### 3. Activity: Өнімділік есебін құру және AI-ұсыныстарын алу
+
+![Activity](docs/diagrams/03-activity.png)
+
+### 4. Sequence: Өнімділік есебін құру және AI-ұсыныстарын алу
+
+![Sequence](docs/diagrams/04-sequence.png)
+
+## Жоба құрылымы
+
+| Жол | Мазмұны |
+|---|---|
+| `app/`, `resources/`, `routes/`, `database/` | Laravel веб-платформасы (тапсырмалар, таймер, әдеттер, аналитика, ұсыныстар, админ) |
+| `desktop-agent/` | Windows Desktop Agent (Python, SQLite офлайн буфер) |
+| `ai-module/` | AI Analyzer (Python, Flask) |
+| `docs/` | API, архитектура, дерекқор, тестілеу; `docs/diagrams/` — алғашқы диаграммалар |
+| `coursework/` | Курстық жоба «Талаптан прототипке дейін»: есеп, диаграммалар, SQL, прототип ([README](coursework/README.md)) |
+
+## Іске қосу
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install && npm install
+cp .env.example .env && php artisan key:generate
+php artisan migrate --seed
+npm run build
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Демо-деректер: `php artisan activitymind:demo-data <email> --days=30 --fresh`. Тесттер: `php artisan test`.
