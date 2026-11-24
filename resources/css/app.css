@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * ActivityMind — дизайн-система.
+ * Тёмная графитовая тема: глубина — ступени поверхностей и тонкие линии, без градиентов и свечений.
+ * Один акцент — янтарь (brand): главное действие, выбранный пункт, идущий таймер.
+ * Шрифты: IBM Plex Sans для интерфейса, JetBrains Mono для времени и чисел.
+ */
+@layer base {
+    body {
+        @apply bg-surface-900 text-[15px] leading-[22px] text-slate-300 antialiased;
+        font-feature-settings: 'tnum' 0;
+    }
+    h1, h2, h3 { @apply font-medium text-slate-100; }
+    ::selection { @apply bg-brand-500/30 text-white; }
+    [x-cloak] { display: none !important; }
+    :focus-visible { @apply outline-none ring-2 ring-brand-400/70 ring-offset-2 ring-offset-surface-900; }
+}
+
+@layer components {
+    /* Карточки */
+    .am-card      { @apply rounded-2xl border border-white/[0.07] bg-surface-800 p-6; }
+    .am-card-title{ @apply mb-4 flex items-center gap-2 text-[15px] font-medium text-slate-100; }
+    .am-card-title > svg { @apply text-slate-500; }
+
+    /* Кнопки: главная — светлая с тёмным текстом, без градиента */
+    .am-btn       { @apply inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-100 px-4 text-sm font-medium text-surface-900 shadow-glow transition-[background-color,transform] hover:bg-white active:scale-[.98] disabled:opacity-50; }
+    .am-btn-ghost { @apply inline-flex h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-sm text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-100; }
+    .am-btn-outline { @apply inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-surface-700 px-4 text-sm font-medium text-slate-100 transition-colors hover:bg-surface-600; }
+    .am-btn-danger { @apply inline-flex h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-sm text-slate-400 transition-colors hover:bg-red-500/10 hover:text-red-300; }
+
+    /* Поля ввода */
+    .am-input     { @apply h-9 w-full rounded-lg border border-white/[0.08] bg-surface-700 px-3 py-0 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-brand-400/60 focus:ring-0; }
+    textarea.am-input { @apply h-auto py-2; }
+    select.am-input { @apply pr-8; }
+    .am-input > option { @apply bg-surface-800; }
+    .am-label     { @apply mb-2 block text-sm text-slate-400; }
+    .am-error     { @apply mt-2 text-sm text-red-400; }
+    .am-check     { @apply rounded border-white/20 bg-surface-700 text-brand-400 focus:ring-brand-400/40 focus:ring-offset-surface-900; }
+
+    /* Вкладки: выбранная — ступень поверхности с бликом */
+    .am-tabs      { @apply inline-flex flex-wrap gap-1 rounded-xl border border-white/[0.07] bg-surface-800 p-1; }
+    .am-tab       { @apply rounded-lg px-3 py-1.5 text-sm text-slate-400 transition-colors hover:text-slate-100; }
+    .am-tab-active{ @apply bg-surface-600 text-slate-100 shadow-glow; }
+
+    /* Метки: тихие, по смыслу */
+    .am-badge     { @apply inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-xs text-slate-300 ring-1 ring-inset ring-white/[0.08]; }
+    .am-badge::before { content: ''; @apply hidden h-1.5 w-1.5 rounded-full; }
+    .am-badge-slate  { @apply text-slate-400; }
+    .am-badge-brand  { @apply text-brand-200 before:inline-block before:bg-brand-400; }
+    .am-badge-sky    { @apply before:inline-block before:bg-slate-400; }
+    .am-badge-green  { @apply before:inline-block before:bg-[#4cc38a]; }
+    .am-badge-amber  { @apply before:inline-block before:bg-brand-400; }
+    .am-badge-rose   { @apply text-red-300 before:inline-block before:bg-[#e5484d]; }
+    .am-badge-teal   { @apply before:inline-block before:bg-slate-500; }
+
+    /* Прочее */
+    .am-link      { @apply text-slate-100 underline decoration-white/20 underline-offset-4 transition-colors hover:decoration-brand-400; }
+    .am-progress  { @apply h-1 overflow-hidden rounded-full bg-white/[0.08]; }
+    .am-progress > div { @apply h-full rounded-full bg-brand-400; }
+    .am-row       { @apply border-b border-white/[0.06] last:border-0; }
+    .am-empty     { @apply py-10 text-center text-sm text-slate-500; }
+    .am-table th  { @apply pb-3 text-left text-xs font-normal text-slate-500; }
+    .am-table td  { @apply py-3; }
+    .am-code      { @apply rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-xs text-slate-200; }
+    .am-num       { @apply font-mono tabular-nums; }
+
+    /* Фирменная деталь: янтарная точка «идёт запись» — только у работающего таймера */
+    .am-rec       { @apply inline-block h-2 w-2 shrink-0 rounded-full bg-brand-400 ring-4 ring-brand-400/15; }
+}

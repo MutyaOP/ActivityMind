@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ActivityMind — мини дизайн-жүйе</title>
+<link href="https://fonts.bunny.net/css?family=ibm-plex-sans:400,500|jetbrains-mono:400,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Графит шкаласы — барлық беттер, мәтін және сызықтар */
+    --s950:#0f0f10; --s900:#141415; --s800:#19191b; --s700:#232325; --s600:#2c2c2f;
+    --text:#ededed; --text2:#a1a1a6; --muted:#85858b; --line:rgba(255,255,255,.07);
+    /* Жалғыз акцент — янтарь */
+    --a50:#fdf6ec; --a100:#fbe9cf; --a200:#f6d29e; --a300:#f0b866; --a400:#e9a23b;
+    --a500:#d98a1f; --a600:#b86f14; --a700:#925612; --a800:#6f4112; --a900:#4d2d0d;
+    --ok:#4cc38a; --bad:#e5484d;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/22px "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; color:var(--text2); background:var(--s900); }
+  main { max-width:1200px; margin:0 auto; padding:48px 32px 64px; }
+  h1 { font-size:28px; line-height:36px; font-weight:500; color:var(--text); margin:0 0 4px; }
+  h2 { font-size:15px; font-weight:500; color:var(--text); margin:40px 0 12px; }
+  p.lead { margin:0; max-width:46rem; }
+  .grid { display:grid; gap:16px; }
+  .g2 { grid-template-columns:repeat(2, 1fr); } .g3 { grid-template-columns:repeat(3, 1fr); } .g4 { grid-template-columns:repeat(4, 1fr); }
+  .card { background:var(--s800); border:1px solid var(--line); border-radius:16px; padding:24px; }
+  .swatches { display:flex; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+  .sw { flex:1; height:64px; display:flex; align-items:flex-end; padding:6px; font:11px "JetBrains Mono", Consolas, monospace; color:var(--text2); }
+  .label { font-size:13px; color:var(--muted); margin-top:12px; }
+  .btn { display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 16px; border-radius:8px; font:500 14px "IBM Plex Sans", sans-serif; border:1px solid transparent; }
+  .btn-primary { color:var(--s900); background:var(--text); box-shadow:inset 0 1px 0 rgba(255,255,255,.1); }
+  .btn-secondary { color:var(--text); background:var(--s700); border-color:var(--line); }
+  .btn-ghost { color:var(--text2); }
+  .btn-danger { color:#fff; background:var(--bad); }
+  .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  .input { width:100%; height:36px; padding:0 12px; border-radius:8px; background:var(--s700); border:1px solid rgba(255,255,255,.08); color:var(--text); font:inherit; font-size:14px; }
+  .input.focus { border-color:rgba(233,162,59,.6); box-shadow:0 0 0 2px rgba(233,162,59,.35); }
+  .input.err { border-color:rgba(229,72,77,.6); }
+  .lbl { display:block; font-size:14px; margin-bottom:8px; }
+  .err-t { color:#f87171; font-size:13px; margin-top:8px; }
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:6px; font-size:12px; color:#c4c4c8; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
+  .badge i { width:6px; height:6px; border-radius:50%; }
+  .tile .v { font:400 28px/32px "JetBrains Mono", monospace; color:var(--text); margin-top:12px; font-variant-numeric:tabular-nums; }
+  .tile .k { font-size:14px; }
+  .tile .h { font-size:12px; color:var(--muted); margin-top:12px; }
+  .progress { height:4px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:16px; }
+  .progress > div { height:100%; background:var(--a400); border-radius:99px; }
+  .tabs { display:inline-flex; padding:4px; gap:4px; border-radius:12px; background:var(--s800); border:1px solid var(--line); }
+  .tab { padding:6px 12px; border-radius:8px; font-size:14px; }
+  .tab.on { background:var(--s600); color:var(--text); box-shadow:inset 0 1px 0 rgba(255,255,255,.1); }
+  .mono { font-family:"JetBrains Mono", Consolas, monospace; }
+  .rec { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--a400); box-shadow:0 0 0 4px rgba(233,162,59,.15); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; font-size:12px; font-weight:400; color:var(--muted); padding:8px 12px; border-bottom:1px solid var(--line); }
+  td { padding:12px; border-bottom:1px solid var(--line); color:var(--text); }
+  .spec { font-size:14px; line-height:24px; }
+  .spec b { color:var(--text); font-weight:500; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ActivityMind — мини дизайн-жүйе</h1>
+  <p class="lead">Токендер, типографика және компоненттер күйлерімен. Бағыты: «түнгі жұмыс үстелі, шам және секундомер» — сабырлы, дәл, сәл жылы. Беттер бейтарап графит, жалғыз акцент — янтарь. Градиенттер, жарқырау және түсті көлеңкелер қолданылмайды.</p>
+
+  <h2>1. Түстер</h2>
+  <div class="grid g2">
+    <div class="card">
+      <div class="swatches">
+        <div class="sw" style="background:var(--s950)">950</div><div class="sw" style="background:var(--s900)">900</div>
+        <div class="sw" style="background:var(--s800)">800</div><div class="sw" style="background:var(--s700)">700</div>
+        <div class="sw" style="background:var(--s600)">600</div>
+      </div>
+      <div class="label">surface — бүйір мәзір (950), бет фоны (900), карточка (800), өріс және белсенді жол (700)</div>
+    </div>
+    <div class="card">
+      <div class="swatches">
+        <div class="sw" style="background:var(--a100);color:#4d2d0d">100</div><div class="sw" style="background:var(--a200);color:#4d2d0d">200</div>
+        <div class="sw" style="background:var(--a300);color:#4d2d0d">300</div><div class="sw" style="background:var(--a400);color:#4d2d0d">400</div>
+        <div class="sw" style="background:var(--a500);color:#4d2d0d">500</div><div class="sw" style="background:var(--a600);color:#fdf6ec">600</div>
+        <div class="sw" style="background:var(--a700);color:#fdf6ec">700</div><div class="sw" style="background:var(--a900);color:#fdf6ec">900</div>
+      </div>
+      <div class="label">brand (янтарь, негізгісі #e9a23b) — тек идущий таймер, бүгінгі баған, мақсат прогресі, фокус сақинасы</div>
+    </div>
+    <div class="card">
+      <div class="swatches">
+        <div class="sw" style="background:var(--text);color:#141415">primary</div><div class="sw" style="background:var(--text2);color:#141415">secondary</div>
+        <div class="sw" style="background:var(--muted);color:#141415">muted</div>
+        <div class="sw" style="background:var(--ok);color:#141415">ok</div><div class="sw" style="background:var(--bad);color:#fff">error</div>
+      </div>
+      <div class="label">мәтіннің үш рөлі және екі семантикалық түс (тек мағына үшін)</div>
+    </div>
+    <div class="card">
+      <div class="swatches">
+        <div class="sw" style="background:#e9a23b;color:#141415">1</div><div class="sw" style="background:#c4c4c8;color:#141415">2</div>
+        <div class="sw" style="background:#85858b;color:#141415">3</div><div class="sw" style="background:#5e5e63">4</div>
+        <div class="sw" style="background:#a9824f;color:#141415">5</div><div class="sw" style="background:#3d3d41">6</div>
+      </div>
+      <div class="label">графиктер: бір серия акцентпен, қалғандары графит сатылары</div>
+    </div>
+  </div>
+
+  <h2>2. Типографика</h2>
+  <div class="grid g2">
+    <div class="card">
+      <div style="font-size:28px;line-height:36px;font-weight:500;color:var(--text)">Бет тақырыбы · 28/36 · 500 — Бүгін</div>
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-top:12px">Карточка тақырыбы · 15/22 · 500 — Апта: фокус және өнімділік</div>
+      <div style="font-size:15px;margin-top:12px">Мәтін · 15/22 · 400 — негізгі мәтін, формалар, кестелер</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:12px">Түсініктеме · 12/16 · muted — мақсат: 240 мин · 79%</div>
+      <div class="mono" style="font-size:28px;color:var(--text);margin-top:16px">01:24:37</div>
+      <div class="label">JetBrains Mono — уақыт, сандар, токендер (tabular-nums)</div>
+    </div>
+    <div class="card spec">
+      <b>Ережелер</b><br>
+      • Шрифт: IBM Plex Sans (интерфейс), JetBrains Mono (уақыт пен сандар).<br>
+      • Салмақтар тек 400 және 500; иерархия өлшем мен түс арқылы.<br>
+      • Капслок және кең әріп аралықтары жоқ.<br>
+      • Аралық шкаласы 4 px торында: 4 · 8 · 12 · 16 · 24 · 32 · 48.<br>
+      • Радиус: 6 (белгі), 8 (батырма, өріс), 16 (карточка).<br>
+      • Контраст: #ededed / #141415 — 16 : 1; secondary #a1a1a6 — 7.4 : 1.<br>
+      • Фокус: 2 px янтарь сақина. Анимация: 150 мс, бір қисық.
+    </div>
+  </div>
+
+  <h2>3. Батырмалар</h2>
+  <div class="card">
+    <div class="row">
+      <span class="btn btn-primary">Таймерді бастау</span>
+      <span class="btn btn-primary" style="background:#fff">Hover</span>
+      <span class="btn btn-primary" style="opacity:.5">Disabled</span>
+      <span class="btn btn-secondary">Болдырмау</span>
+      <span class="btn btn-ghost">Өзгерту</span>
+      <span class="btn btn-danger">Жою</span>
+    </div>
+  </div>
+
+  <h2>4. Форма элементтері</h2>
+  <div class="grid g3">
+    <div class="card"><label class="lbl">Тапсырма атауы</label><input class="input" value="Курстық жұмыс, 2-тарау"><div class="label">Default</div></div>
+    <div class="card"><label class="lbl">Электрондық пошта</label><input class="input focus" value="aigerim@demo.test"><div class="label">Focus</div></div>
+    <div class="card"><label class="lbl">Құпиясөз</label><input class="input err" value="••••"><div class="err-t">Құпиясөз кемінде 8 таңбадан тұруы керек</div></div>
+  </div>
+
+  <h2>5. Белгілер, табтар, прогресс, фирмалық белгі</h2>
+  <div class="grid g4">
+    <div class="card row">
+      <span class="badge"><i style="background:var(--bad)"></i>Жоғары</span><span class="badge"><i style="background:var(--a400)"></i>Орташа</span>
+      <span class="badge">Төмен</span><span class="badge"><i style="background:var(--ok)"></i>Орындалды</span>
+    </div>
+    <div class="card"><div class="tabs"><span class="tab on">7 күн</span><span class="tab">30 күн</span><span class="tab">90 күн</span></div></div>
+    <div class="card"><div style="font-size:14px">Күндік мақсат</div><div class="progress"><div style="width:79%"></div></div><div class="label mono">190 / 240 мин</div></div>
+    <div class="card"><div class="row"><span class="rec"></span><span style="color:var(--text)">Таймер жүріп тұр</span></div><div class="label">Жалғыз фирмалық белгі: тек жұмыс істеп тұрған таймерде</div></div>
+  </div>
+
+  <h2>6. Көрсеткіш карточкалары</h2>
+  <div class="grid g4">
+    <div class="card tile"><div class="k">Бүгінгі фокус</div><div class="v">3 сағ 10 мин</div><div class="progress"><div style="width:79%"></div></div><div class="h">Мақсат: 240 мин · 79%</div></div>
+    <div class="card tile"><div class="k">Тапсырмалар</div><div class="v">4 / 7</div><div class="h">Белсенді тапсырмалар: 3</div></div>
+    <div class="card tile"><div class="k">Әдеттер</div><div class="v">83%</div><div class="h">Өткен аптадан +6%</div></div>
+    <div class="card tile"><div class="k">Өнімділік</div><div class="v">78 / 100</div><div class="h">Апталық орташа: 64</div></div>
+  </div>
+
+  <h2>7. Кесте</h2>
+  <div class="card">
+    <table>
+      <tr><th>Тапсырма</th><th>Басымдық</th><th>Мерзімі</th><th>Күйі</th></tr>
+      <tr><td>ER-диаграмманы аяқтау</td><td><span class="badge"><i style="background:var(--bad)"></i>Жоғары</span></td><td class="mono" style="color:#f87171">22.11 · өтті</td><td><span class="badge">Орындалуда</span></td></tr>
+      <tr><td>Сынаққа дайындық</td><td><span class="badge"><i style="background:var(--a400)"></i>Орташа</span></td><td class="mono">28.11</td><td><span class="badge">Жоспарда</span></td></tr>
+      <tr><td>Жүзу</td><td><span class="badge">Төмен</span></td><td class="mono">—</td><td><span class="badge"><i style="background:var(--ok)"></i>Орындалды</span></td></tr>
+    </table>
+  </div>
+</main>
+</body>
+</html>

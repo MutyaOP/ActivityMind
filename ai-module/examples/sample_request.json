@@ -1,0 +1,144 @@
+{
+  "user_id": 1,
+  "timezone": "Asia/Almaty",
+  "days": {
+    "2026-11-02": {
+      "focus_sec": 16560,
+      "tracked_sec": 26496,
+      "tasks_done": 2,
+      "habits_done": 4,
+      "habits_total": 4,
+      "score": 94
+    },
+    "2026-11-03": {
+      "focus_sec": 17640,
+      "tracked_sec": 28224,
+      "tasks_done": 3,
+      "habits_done": 4,
+      "habits_total": 4,
+      "score": 100
+    },
+    "2026-11-04": {
+      "focus_sec": 15840,
+      "tracked_sec": 25344,
+      "tasks_done": 2,
+      "habits_done": 3,
+      "habits_total": 4,
+      "score": 91
+    },
+    "2026-11-05": {
+      "focus_sec": 14759,
+      "tracked_sec": 23616,
+      "tasks_done": 1,
+      "habits_done": 3,
+      "habits_total": 4,
+      "score": 79
+    },
+    "2026-11-06": {
+      "focus_sec": 2160,
+      "tracked_sec": 3456,
+      "tasks_done": 0,
+      "habits_done": 1,
+      "habits_total": 4,
+      "score": 10
+    },
+    "2026-11-07": {
+      "focus_sec": 13680,
+      "tracked_sec": 21888,
+      "tasks_done": 2,
+      "habits_done": 4,
+      "habits_total": 4,
+      "score": 80
+    },
+    "2026-11-08": {
+      "focus_sec": 12600,
+      "tracked_sec": 20160,
+      "tasks_done": 1,
+      "habits_done": 2,
+      "habits_total": 4,
+      "score": 69
+    },
+    "2026-11-09": {
+      "focus_sec": 14040,
+      "tracked_sec": 22464,
+      "tasks_done": 2,
+      "habits_done": 3,
+      "habits_total": 4,
+      "score": 82
+    },
+    "2026-11-10": {
+      "focus_sec": 10800,
+      "tracked_sec": 17280,
+      "tasks_done": 1,
+      "habits_done": 2,
+      "habits_total": 4,
+      "score": 60
+    },
+    "2026-11-11": {
+      "focus_sec": 10080,
+      "tracked_sec": 16128,
+      "tasks_done": 1,
+      "habits_done": 2,
+      "habits_total": 4,
+      "score": 56
+    },
+    "2026-11-12": {
+      "focus_sec": 9000,
+      "tracked_sec": 14400,
+      "tasks_done": 0,
+      "habits_done": 1,
+      "habits_total": 4,
+      "score": 45
+    },
+    "2026-11-13": {
+      "focus_sec": 1440,
+      "tracked_sec": 2304,
+      "tasks_done": 0,
+      "habits_done": 0,
+      "habits_total": 4,
+      "score": 7
+    },
+    "2026-11-14": {
+      "focus_sec": 7200,
+      "tracked_sec": 11520,
+      "tasks_done": 1,
+      "habits_done": 2,
+      "habits_total": 4,
+      "score": 42
+    },
+    "2026-11-15": {
+      "focus_sec": 5040,
+      "tracked_sec": 8064,
+      "tasks_done": 0,
+      "habits_done": 1,
+      "habits_total": 4,
+      "score": 25
+    }
+  },
+  "hours": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1.2,
+    2.4,
+    2.1,
+    0,
+    0,
+    1.6,
+    1.9,
+    1.2,
+    0,
+    0,
+    0,
+    0.8,
+    0,
+    0,
+    0
+  ]
+}
