@@ -12,12 +12,15 @@ class Session:
     started_at: datetime  # UTC
     duration_sec: int
     is_idle: bool
+    category_hint: str = ""  # категория, определённая на компьютере по заголовку (заголовок может не отправляться)
 
 
 class SessionBuilder:
     """
     Правила:
     * смена (приложение, заголовок, простой) закрывает текущую сессию и открывает новую;
+    * простой начинается с момента последнего ввода (idle_since), а не с момента, когда истёк порог:
+      иначе первые минуты каждого перерыва засчитывались бы программе, открытой перед ним;
     * сессии короче min_session_sec отбрасываются (случайные переключения окон);
     * сессия дольше max_session_sec режется на части;
     * если между замерами прошло больше max_gap_sec (сон компьютера, пауза агента),
@@ -32,7 +35,7 @@ class SessionBuilder:
         self._start: datetime | None = None
         self._last_seen: datetime | None = None
 
-    def feed(self, now: datetime, app: str, title: str, idle: bool) -> list[Session]:
+    def feed(self, now: datetime, app: str, title: str, idle: bool, idle_since: datetime | None = None) -> list[Session]:
         key = (app, title, bool(idle))
         out: list[Session] = []
 
@@ -46,20 +49,31 @@ class SessionBuilder:
             return out
 
         if key != self._key or (now - self._start).total_seconds() >= self.max_session_sec:
-            out += self._close(now)
-            self._open(key, now)
+            cut = now
+            if idle and not self._key[2] and idle_since is not None:
+                # переход в простой: прошлая сессия закончилась на последнем вводе
+                cut = min(now, max(self._start, idle_since))
+            out += self._close(cut)
+            self._open(key, cut)
+            self._last_seen = now
         else:
             self._last_seen = now
 
         return out
 
     def flush(self, now: datetime) -> list[Session]:
-        """Закрывает текущую сессию (при остановке агента)."""
+        """Закрывает текущую сессию (при остановке или паузе агента)."""
         if self._key is None:
             return []
         out = self._close(now)
         self._key = self._start = self._last_seen = None
         return out
+
+    def current(self) -> tuple[str, datetime] | None:
+        """Открытая сейчас сессия (приложение, начало), если это не простой."""
+        if self._key is None or self._key[2]:
+            return None
+        return self._key[0], self._start
 
     # ------------------------------------------------------------------
 

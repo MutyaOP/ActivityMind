@@ -13,7 +13,11 @@ class Device extends Model
 
     protected $hidden = ['token_hash'];
 
-    protected $casts = ['last_sync_at' => 'datetime'];
+    protected $casts = [
+        'last_sync_at' => 'datetime',
+        'is_paused' => 'boolean',
+        'current_since' => 'datetime',
+    ];
 
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function activityLogs(): HasMany { return $this->hasMany(ActivityLog::class); }
@@ -33,6 +37,12 @@ class Device extends Model
         $this->forceFill(['token_hash' => self::hashToken($plain)])->save();
 
         return $plain;
+    }
+
+    /** Программа, открытая сейчас, если агент на связи и не на паузе. */
+    public function currentApp(): ?string
+    {
+        return $this->isOnline(5) && ! $this->is_paused ? $this->current_app : null;
     }
 
     public function isOnline(int $minutes = 10): bool

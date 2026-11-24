@@ -27,12 +27,19 @@ class SeedDemoData extends Command
     protected $description = 'Добавляет демо-данные (задачи, время, привычки, логи агента) пользователю, чтобы наполнить дашборд';
 
     private const PRODUCTIVE_APPS = [
-        'Программирование' => ['Code.exe', 'WindowsTerminal.exe', 'phpstorm64.exe'],
+        'Программирование' => ['Code.exe', 'WindowsTerminal.exe', 'phpstorm64.exe', 'chrome.exe'],
         'Работа' => ['WINWORD.EXE', 'EXCEL.EXE', 'Teams.exe'],
-        'Учёба' => ['Obsidian.exe', 'anki.exe'],
+        'Учёба' => ['Obsidian.exe', 'anki.exe', 'chrome.exe'],
     ];
 
     private const REST_APPS = ['chrome.exe', 'Telegram.exe', 'Discord.exe', 'steam.exe', 'Spotify.exe'];
+
+    /** Названия вкладок браузера (как их присылает агент: от 5 минут, без имени браузера). */
+    private const TABS = [
+        'Программирование' => ['Routing - Laravel 13.x - The PHP Framework', 'php - Eloquent eager loading - Stack Overflow', 'MutyaOP/ActivityMind - GitHub'],
+        'Учёба' => ['Google Classroom', 'Лекция 7. Нормализация БД - Moodle', 'Базы данных - Stepik'],
+        'Отдых' => ['Lo-fi музыка для учёбы - YouTube', 'Новости - ВКонтакте', 'Just Chatting - Twitch'],
+    ];
 
     public function handle(): int
     {
@@ -165,11 +172,14 @@ class SeedDemoData extends Command
             if ($len < 30) {
                 break;
             }
+            $app = $distract ? self::REST_APPS[array_rand(self::REST_APPS)] : self::PRODUCTIVE_APPS[$catName][array_rand(self::PRODUCTIVE_APPS[$catName])];
+            $tabs = self::TABS[$distract ? 'Отдых' : $catName] ?? null;
+            $title = $app === 'chrome.exe' && $tabs && $len >= 300 ? $tabs[array_rand($tabs)] : null;
             $rows[] = [
                 'user_id' => $user->id, 'device_id' => $device->id,
                 'category_id' => $distract ? $rest->id : $work->id,
-                'app_name' => $distract ? self::REST_APPS[array_rand(self::REST_APPS)] : self::PRODUCTIVE_APPS[$catName][array_rand(self::PRODUCTIVE_APPS[$catName])],
-                'window_title' => null, 'started_at' => $t->copy(), 'duration_sec' => (int) $len,
+                'app_name' => $app,
+                'window_title' => $title, 'started_at' => $t->copy(), 'duration_sec' => (int) $len,
                 'is_idle' => false, 'created_at' => $now, 'updated_at' => $now,
             ];
             $t->addSeconds((int) $len + rand(5, 40));

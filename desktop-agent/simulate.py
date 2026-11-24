@@ -9,12 +9,13 @@ from session_builder import Session
 # (приложение, заголовок, вес)
 APPS = [
     ("Code", "main.php - ActivityMind", 5),
-    ("chrome", "Laravel documentation", 3),
+    ("chrome", "Routing - Laravel 13.x - The PHP Framework - Google Chrome", 3),
     ("WINWORD", "Диплом.docx", 3),
     ("WindowsTerminal", "php artisan serve", 2),
-    ("chrome", "Google Classroom", 2),
+    ("chrome", "Google Classroom - Google Chrome", 2),
+    ("chrome", "php - Eloquent eager loading - Stack Overflow - Google Chrome", 1),
     ("Telegram", "", 1),
-    ("chrome", "YouTube", 1),
+    ("chrome", "Lo-fi beats to study to - YouTube - Google Chrome", 1),
     ("Spotify", "", 1),
 ]
 

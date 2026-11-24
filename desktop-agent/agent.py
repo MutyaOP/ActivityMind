@@ -5,14 +5,17 @@ import argparse
 import logging
 import os
 import sys
-import time
-from datetime import datetime, timezone
+from dataclasses import replace
+from datetime import datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
 
+import browser
 import config as config_module
 import simulate
 import tracker
-from session_builder import SessionBuilder
+from control import Control
+from instance_lock import InstanceLock
+from session_builder import Session, SessionBuilder
 from storage import Buffer
 from sync_client import ApiClient, AuthError, RejectedError, TransientError
 
@@ -72,35 +75,111 @@ def _send_one_by_one(client: ApiClient, buffer: Buffer, rows: list[dict]) -> str
     return "ok"
 
 
-def run(cfg: config_module.Config, client: ApiClient, buffer: Buffer) -> int:
-    builder = SessionBuilder(cfg.min_session_sec, cfg.max_session_sec, max_gap_sec=cfg.poll_interval_sec * 6)
-    next_sync = time.monotonic() + cfg.sync_interval_sec
-    backoff = cfg.sync_interval_sec
+def prepare(sessions: list[Session], cfg: config_module.Config) -> list[Session]:
+    """
+    Решает, что из сессии уйдёт на сайт.
+    Браузер: категория вкладки определяется здесь, по заголовку; сам заголовок отправляется,
+    только если на вкладке провели не меньше min_tab_sec. Остальные программы: заголовок —
+    только при track_window_titles.
+    """
+    out = []
+    for s in sessions:
+        if s.is_idle:
+            out.append(replace(s, window_title=""))
+        elif browser.is_browser(s.app_name):
+            keep = cfg.track_window_titles or (cfg.track_browser_tabs and s.duration_sec >= cfg.min_tab_sec)
+            out.append(replace(s, window_title=browser.clean_title(s.window_title) if keep else "",
+                               category_hint=browser.category_hint(s.window_title)))
+        else:
+            out.append(replace(s, window_title=s.window_title if cfg.track_window_titles else ""))
+    return out
 
-    log.info("Агент запущен. Заголовки окон: %s. Ctrl+C для остановки.", "включены" if cfg.track_window_titles else "выключены")
+
+def key_title(app: str, title: str, cfg: config_module.Config) -> str:
+    """Заголовок, по смене которого режутся сессии: у браузера — всегда (каждая вкладка отдельно)."""
+    return title if (cfg.track_window_titles or browser.is_browser(app)) else ""
+
+
+def agent_state(builder: SessionBuilder, control: Control) -> dict:
+    current = None if control.paused else builder.current()
+    return {
+        "paused": control.paused,
+        "current_app": current[0] if current else None,
+        "current_since": current[1].strftime("%Y-%m-%dT%H:%M:%SZ") if current else None,
+    }
+
+
+def send_state(client: ApiClient, builder: SessionBuilder, control: Control) -> str:
+    try:
+        client.heartbeat(agent_state(builder, control))
+    except AuthError:
+        return "fatal"
+    except (TransientError, RejectedError):
+        return "retry"
+    return "ok"
+
+
+def run(cfg: config_module.Config, client: ApiClient, buffer: Buffer, control: Control | None = None,
+        sampler=None, clock=utcnow, monotonic=None, max_ticks: int | None = None) -> int:
+    """Основной цикл. sampler/clock/monotonic/max_ticks подменяются в тестах."""
+    import time
+
+    control = control or Control()
+    sampler = sampler or (lambda: tracker.sample(cfg.idle_threshold_sec, cfg.ignore_apps))
+    monotonic = monotonic or time.monotonic
+    builder = SessionBuilder(cfg.min_session_sec, cfg.max_session_sec, max_gap_sec=cfg.poll_interval_sec * 6)
+    next_sync = monotonic()  # сразу сообщаем сайту, что агент запущен
+    backoff = cfg.sync_interval_sec
+    was_paused = False
+    ticks = 0
+
+    log.info("Агент запущен. Вкладки браузера от %s мин: %s. Заголовки остальных окон: %s.",
+             cfg.min_tab_sec // 60, "да" if cfg.track_browser_tabs else "нет",
+             "да" if cfg.track_window_titles else "нет")
     code = 0
     try:
-        while True:
-            app, title, idle = tracker.sample(cfg.idle_threshold_sec, cfg.track_window_titles, cfg.ignore_apps)
-            buffer.add(builder.feed(utcnow(), app, title, idle))
+        while not control.stopped:
+            now = clock()
+            if control.paused:
+                if not was_paused:
+                    buffer.add(prepare(builder.flush(now), cfg))
+                    log.info("Пауза: активность не записывается.")
+                    was_paused = True
+                    next_sync = monotonic()
+            else:
+                if was_paused:
+                    log.info("Мониторинг продолжен.")
+                    was_paused = False
+                    next_sync = monotonic()
+                app, title, idle, idle_sec = sampler()
+                idle_since = now - timedelta(seconds=idle_sec) if idle else None
+                buffer.add(prepare(builder.feed(now, app, key_title(app, title, cfg), idle, idle_since), cfg))
 
-            if time.monotonic() >= next_sync:
+            if monotonic() >= next_sync:
                 state = flush_buffer(client, buffer, cfg.batch_size)
+                if state == "ok":
+                    state = send_state(client, builder, control)
                 if state == "fatal":
                     log.error("Токен недействителен. Выпустите новый на сайте («Устройства») и обновите config.ini.")
                     code = 2
                     break
                 backoff = cfg.sync_interval_sec if state == "ok" else min(backoff * 2, 600)
-                next_sync = time.monotonic() + backoff
+                next_sync = monotonic() + backoff
                 buffer.purge_sent()
 
-            time.sleep(cfg.poll_interval_sec)
+            ticks += 1
+            if max_ticks is not None and ticks >= max_ticks:
+                break
+            if control.wait(cfg.poll_interval_sec):
+                next_sync = min(next_sync, monotonic())  # пауза/продолжение — сразу сообщить сайту
     except KeyboardInterrupt:
         log.info("Остановка по Ctrl+C...")
     finally:
-        buffer.add(builder.flush(utcnow()))
+        buffer.add(prepare(builder.flush(clock()), cfg))
         if code == 0:
             flush_buffer(client, buffer, cfg.batch_size)
+            control.pause()  # сайт покажет, что учёт не идёт
+            send_state(client, builder, control)
     return code
 
 
@@ -124,6 +203,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", default=os.path.join(BASE_DIR, "config.ini"), help="путь к config.ini")
     parser.add_argument("--check", action="store_true", help="проверить токен и связь с сайтом и выйти")
     parser.add_argument("--simulate-days", type=int, metavar="N", help="создать и отправить демо-историю за N дней и выйти")
+    parser.add_argument("--no-tray", action="store_true", help="не показывать значок в трее")
     args = parser.parse_args(argv)
 
     setup_logging()
@@ -154,17 +234,29 @@ def main(argv: list[str] | None = None) -> int:
     buffer = Buffer(os.path.join(BASE_DIR, "buffer.db"))
 
     if args.simulate_days:
-        sessions = simulate.history(args.simulate_days, cfg.track_window_titles)
+        sessions = prepare(simulate.history(args.simulate_days, track_titles=True), cfg)
         added = buffer.add(sessions)
         log.info("Сгенерировано сессий: %s (новых в буфере: %s)", len(sessions), added)
         state = flush_buffer(client, buffer, cfg.batch_size)
         return 0 if state == "ok" else 2
 
+    lock = InstanceLock(os.path.join(BASE_DIR, "agent.lock"))
+    if not lock.acquire():
+        log.error("Агент уже запущен на этом компьютере. Вторая копия записала бы время дважды.")
+        return 4
+
+    control = Control()
+    if not args.no_tray:
+        import tray
+
+        tray.start(control)
     try:
-        return run(cfg, client, buffer)
+        return run(cfg, client, buffer, control)
     except NotImplementedError as exc:
         log.error("%s", exc)
         return 1
+    finally:
+        lock.release()
 
 
 if __name__ == "__main__":

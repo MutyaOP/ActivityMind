@@ -15,6 +15,8 @@ class Config:
     min_session_sec: int = 3
     max_session_sec: int = 3600
     track_window_titles: bool = False
+    track_browser_tabs: bool = True
+    min_tab_sec: int = 300
     ignore_apps: list[str] = field(default_factory=list)
     sync_interval_sec: int = 60
     batch_size: int = 200
@@ -47,6 +49,8 @@ def load(path: str) -> Config:
         min_session_sec=get("tracking", "min_session_sec", 3, int),
         max_session_sec=get("tracking", "max_session_sec", 3600, int),
         track_window_titles=get("tracking", "track_window_titles", False, bool),
+        track_browser_tabs=get("tracking", "track_browser_tabs", True, bool),
+        min_tab_sec=get("tracking", "min_tab_sec", 300, int),
         ignore_apps=[a.strip().lower() for a in ignore.split(",") if a.strip()],
         sync_interval_sec=get("sync", "interval_sec", 60, int),
         batch_size=get("sync", "batch_size", 200, int),

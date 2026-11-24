@@ -20,6 +20,7 @@ class IngestActivityRequest extends FormRequest
             'items.*.started_at'   => ['required', 'date', 'before_or_equal:+5 minutes'],
             'items.*.duration_sec' => ['required', 'integer', 'min:1', 'max:86400'],
             'items.*.is_idle'      => ['nullable', 'boolean'],
+            'items.*.category_hint' => ['nullable', 'string', 'in:'.implode(',', array_keys(\App\Services\AppCategorizer::HINTS))],
         ];
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AnalyticsController;
@@ -36,6 +37,9 @@ Route::middleware('auth')->group(function () {
 
     // Аналитика
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+    // Активность за компьютером (Desktop Agent): текущий сеанс и история по дням
+    Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
 
     // Рекомендации
     Route::get('/recommendations', [RecommendationController::class, 'index'])->name('recommendations.index');

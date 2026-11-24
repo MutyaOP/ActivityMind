@@ -175,4 +175,61 @@ class AgentApiTest extends TestCase
         // Простой в «отслеживаемое время» не входит
         $this->assertSame(600, (int) DailyStat::where('user_id', $user->id)->sum('tracked_sec'));
     }
+    // ---------- вкладки браузера и состояние агента ----------
+
+    public function test_category_hint_from_agent_sets_category(): void
+    {
+        $this->seed(CategorySeeder::class);
+        [, $token] = $this->device();
+
+        $this->send($token, [$this->item(['app_name' => 'chrome', 'window_title' => null, 'category_hint' => 'rest'])])->assertOk();
+
+        $this->assertSame('Отдых', ActivityLog::first()->category->name);
+    }
+
+    public function test_unknown_category_hint_is_rejected(): void
+    {
+        [, $token] = $this->device();
+
+        $this->send($token, [$this->item(['category_hint' => 'hacking'])])->assertUnprocessable();
+    }
+
+    public function test_short_browser_tab_title_is_not_stored(): void
+    {
+        $this->seed(CategorySeeder::class);
+        [, $token] = $this->device();
+
+        $this->send($token, [
+            $this->item(['app_name' => 'chrome', 'window_title' => 'YouTube', 'duration_sec' => 120]),
+            $this->item(['app_name' => 'chrome', 'window_title' => 'Google Classroom', 'duration_sec' => 600,
+                'started_at' => now()->subMinutes(30)->utc()->format('Y-m-d\TH:i:s\Z')]),
+        ])->assertOk();
+
+        $logs = ActivityLog::orderBy('started_at')->get();
+        $this->assertNull($logs[0]->window_title);
+        $this->assertSame('Отдых', $logs[0]->category->name);  // категорию по заголовку всё равно определили
+        $this->assertSame('Google Classroom', $logs[1]->window_title);
+    }
+
+    public function test_heartbeat_stores_agent_state(): void
+    {
+        [$device, $token] = $this->device();
+        $since = now()->subMinutes(10)->utc()->format('Y-m-d\TH:i:s\Z');
+
+        $this->postJson('/api/agent/heartbeat', ['paused' => false, 'current_app' => 'Code', 'current_since' => $since],
+            ['Authorization' => "Bearer {$token}"])->assertOk();
+        $device->refresh();
+        $this->assertSame('Code', $device->currentApp());
+        $this->assertFalse($device->is_paused);
+
+        $this->postJson('/api/agent/heartbeat', ['paused' => true, 'current_app' => 'Code'],
+            ['Authorization' => "Bearer {$token}"])->assertOk();
+        $device->refresh();
+        $this->assertTrue($device->is_paused);
+        $this->assertNull($device->currentApp());
+
+        // --check шлёт пустой запрос — состояние не трогается
+        $this->postJson('/api/agent/heartbeat', [], ['Authorization' => "Bearer {$token}"])->assertOk();
+        $this->assertTrue($device->fresh()->is_paused);
+    }
 }

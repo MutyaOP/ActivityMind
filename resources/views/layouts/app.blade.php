@@ -18,6 +18,7 @@
         ['Таймер',       'timer.index',           'timer'],
         ['Привычки',     'habits.index',          'repeat'],
         ['Аналитика',    'analytics.index',       'chart'],
+        ['Активность',   'activity.index',        'clock'],
         ['Рекомендации', 'recommendations.index', 'bulb'],
         ['Устройства',   'devices.index',         'device'],
     ];

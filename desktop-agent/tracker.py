@@ -67,17 +67,21 @@ def get_active_window() -> tuple[str, str] | None:
     return (name or "unknown", title_buf.value)
 
 
-def sample(idle_threshold_sec: int, track_titles: bool, ignore_apps: list[str]) -> tuple[str, str, bool]:
-    """Один замер: (приложение, заголовок, простой)."""
-    if get_idle_seconds() >= idle_threshold_sec:
-        return (IDLE_LABEL, "", True)
+def sample(idle_threshold_sec: int, ignore_apps: list[str]) -> tuple[str, str, bool, float]:
+    """
+    Один замер: (приложение, заголовок, простой, секунд без ввода).
+    Заголовок возвращается всегда — что из него уйдёт на сайт, решает агент (см. browser.py, agent.prepare).
+    """
+    idle_sec = get_idle_seconds()
+    if idle_sec >= idle_threshold_sec:
+        return (IDLE_LABEL, "", True, idle_sec)
 
     window = get_active_window()
     if window is None:
-        return (NO_WINDOW_LABEL, "", False)
+        return (NO_WINDOW_LABEL, "", False, idle_sec)
 
     app, title = window
     if app.lower() in ignore_apps:
-        return (HIDDEN_LABEL, "", False)
+        return (HIDDEN_LABEL, "", False, idle_sec)
 
-    return (app, title if track_titles else "", False)
+    return (app, title, False, idle_sec)

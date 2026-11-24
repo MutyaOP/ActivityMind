@@ -21,22 +21,28 @@ class Buffer:
                    started_at TEXT NOT NULL,
                    duration_sec INTEGER NOT NULL,
                    is_idle INTEGER NOT NULL DEFAULT 0,
-                   sent INTEGER NOT NULL DEFAULT 0
+                   sent INTEGER NOT NULL DEFAULT 0,
+                   category_hint TEXT NOT NULL DEFAULT ''
                )"""
         )
+        # буфер от прошлой версии агента: добавить новую колонку
+        columns = {row[1] for row in self.conn.execute("PRAGMA table_info(sessions)")}
+        if "category_hint" not in columns:
+            self.conn.execute("ALTER TABLE sessions ADD COLUMN category_hint TEXT NOT NULL DEFAULT ''")
         # та же «личность» записи, что и на сервере: время начала + приложение
         self.conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS ux_sessions ON sessions (started_at, app_name)")
         self.conn.commit()
 
     def add(self, sessions: Iterable[Session]) -> int:
         rows = [
-            (s.app_name, s.window_title, s.started_at.strftime(ISO), s.duration_sec, int(s.is_idle))
+            (s.app_name, s.window_title, s.started_at.strftime(ISO), s.duration_sec, int(s.is_idle), s.category_hint)
             for s in sessions
         ]
         if not rows:
             return 0
         cur = self.conn.executemany(
-            "INSERT OR IGNORE INTO sessions (app_name, window_title, started_at, duration_sec, is_idle) VALUES (?,?,?,?,?)",
+            "INSERT OR IGNORE INTO sessions (app_name, window_title, started_at, duration_sec, is_idle, category_hint) "
+            "VALUES (?,?,?,?,?,?)",
             rows,
         )
         self.conn.commit()
@@ -44,13 +50,13 @@ class Buffer:
 
     def pending(self, limit: int = 200) -> list[dict]:
         cur = self.conn.execute(
-            "SELECT id, app_name, window_title, started_at, duration_sec, is_idle "
+            "SELECT id, app_name, window_title, started_at, duration_sec, is_idle, category_hint "
             "FROM sessions WHERE sent = 0 ORDER BY started_at LIMIT ?",
             (limit,),
         )
         return [
             {"id": r[0], "app_name": r[1], "window_title": r[2], "started_at": r[3],
-             "duration_sec": r[4], "is_idle": bool(r[5])}
+             "duration_sec": r[4], "is_idle": bool(r[5]), "category_hint": r[6]}
             for r in cur.fetchall()
         ]
 

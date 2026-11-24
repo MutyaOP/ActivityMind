@@ -28,8 +28,9 @@ class ApiClient:
             "Accept": "application/json",
         })
 
-    def heartbeat(self) -> dict:
-        return self._post("/api/agent/heartbeat", {})
+    def heartbeat(self, state: dict | None = None) -> dict:
+        """Проверка связи; state — пауза и текущая программа для страницы «Активность» на сайте."""
+        return self._post("/api/agent/heartbeat", state or {})
 
     def send(self, rows: list[dict]) -> dict:
         items = []
@@ -42,6 +43,8 @@ class ApiClient:
             }
             if r.get("window_title"):
                 item["window_title"] = r["window_title"][:1000]
+            if r.get("category_hint"):
+                item["category_hint"] = r["category_hint"]
             items.append(item)
         return self._post("/api/agent/activity", {"items": items})
 

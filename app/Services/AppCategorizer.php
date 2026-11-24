@@ -6,7 +6,8 @@ use App\Models\Category;
 
 /**
  * Определяет системную категорию по имени приложения и (если агент его передаёт) заголовку окна.
- * Правила простые и прозрачные: подстрока в нижнем регистре. Сначала заголовок, затем приложение.
+ * Правила простые и прозрачные: подстрока в нижнем регистре. Сначала подсказка агента
+ * (он определяет категорию вкладки браузера на компьютере, не отправляя её заголовок), затем заголовок, затем приложение.
  */
 class AppCategorizer
 {
@@ -26,11 +27,31 @@ class AppCategorizer
 
     private const BROWSERS = ['chrome', 'msedge', 'firefox', 'opera', 'brave', 'vivaldi', 'yandex', 'browser'];
 
+    /** Подсказки агента → системные категории. */
+    public const HINTS = [
+        'study'       => 'Учёба',
+        'programming' => 'Программирование',
+        'work'        => 'Работа',
+        'rest'        => 'Отдых',
+    ];
+
+    /** Вкладка браузера сохраняется с названием, только если на ней провели не меньше этого времени. */
+    public const MIN_TAB_SEC = 300;
+
+    public function isBrowser(string $app): bool
+    {
+        return $this->containsAny(mb_strtolower($app), self::BROWSERS);
+    }
+
     /** @var array<string,int>|null */
     private ?array $ids = null;
 
-    public function categoryName(string $app, ?string $title = null): ?string
+    public function categoryName(string $app, ?string $title = null, ?string $hint = null): ?string
     {
+        if ($hint !== null && isset(self::HINTS[$hint])) {
+            return self::HINTS[$hint];
+        }
+
         $app = mb_strtolower($app);
         $title = mb_strtolower($title ?? '');
 
@@ -51,9 +72,9 @@ class AppCategorizer
         return $this->containsAny($app, self::BROWSERS) ? 'Прочее' : null;
     }
 
-    public function categoryId(string $app, ?string $title = null): ?int
+    public function categoryId(string $app, ?string $title = null, ?string $hint = null): ?int
     {
-        $name = $this->categoryName($app, $title);
+        $name = $this->categoryName($app, $title, $hint);
         if ($name === null) {
             return null;
         }
