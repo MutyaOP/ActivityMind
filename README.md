@@ -77,3 +77,16 @@ php artisan serve
 ```
 
 Демо-деректер: `php artisan activitymind:demo-data <email> --days=56 --fresh`. Тесттер: `php artisan test`.
+
+### Бір рет басып іске қосу (Windows + XAMPP)
+
+`ActivityMind.cmd` — MySQL (XAMPP), сайт (`http://localhost:8000`), AI-модуль және Desktop Agent-ті бірден іске қосып, сайтты браузерде ашады. Бұрыннан жұмыс істеп тұрғаны қайта іске қосылмайды, миграциялар автоматты түрде орындалады. `ActivityMind-stop.cmd` — бәрін тоқтатады.
+
+| Параметр | Мағынасы |
+|---|---|
+| `-Port 8001` | сайт басқа портта |
+| `-XamppDir D:\xampp` | XAMPP басқа бумада (әйтпесе `C:\xampp` немесе `XAMPP_DIR` айнымалысы) |
+| `-NoAgent`, `-NoBrowser` | агентті / браузерді іске қоспау |
+| `-KeepDatabase` (тек stop) | MySQL-ді тоқтатпау |
+
+Журналдар: `storage\logs\launcher-*.log`. Жұмыс үстеліне белгіше: `ActivityMind.cmd` файлында тінтуірдің оң жақ батырмасы → «Отправить → Рабочий стол».
