@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -19,6 +21,10 @@ class AiAnalyzerClient
 {
     private const TYPES = ['focus', 'break', 'habit', 'planning', 'other'];
 
+    /** Если модуль не запущен, не ждём его на каждой странице: пауза перед следующей попыткой. */
+    private const DOWN_KEY = 'ai_analyzer_down';
+    private const DOWN_MINUTES = 10;
+
     public function enabled(): bool
     {
         return filled(config('services.ai_analyzer.url'));
@@ -27,12 +33,13 @@ class AiAnalyzerClient
     /** @return array<int, array{key:?string, type:string, text:string}> */
     public function suggest(User $user, array $metrics): array
     {
-        if (! $this->enabled()) {
+        if (! $this->enabled() || Cache::has(self::DOWN_KEY)) {
             return [];
         }
 
         try {
-            $http = Http::timeout(5)->acceptJson();
+            // Модуль работает на этом же компьютере: подключение должно быть мгновенным
+            $http = Http::connectTimeout(1)->timeout(5)->acceptJson();
             if ($token = config('services.ai_analyzer.token')) {
                 $http = $http->withToken($token);
             }
@@ -58,6 +65,10 @@ class AiAnalyzerClient
                 ->take(3)
                 ->values()
                 ->all();
+        } catch (ConnectionException) {
+            Cache::put(self::DOWN_KEY, true, now()->addMinutes(self::DOWN_MINUTES));
+
+            return [];
         } catch (\Throwable $e) {
             report($e);
 

@@ -2,17 +2,19 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User;
 use App\Services\AiAnalyzerClient;
+use App\Services\AiPayloadBuilder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
 class AiCheck extends Command
 {
-    protected $signature = 'activitymind:ai-check';
+    protected $signature = 'activitymind:ai-check {--email= : Проверить на реальных данных пользователя (8 недель)}';
 
     protected $description = 'Проверяет подключение к AI-модулю: настройки, связь и ответ на тестовых данных';
 
-    public function handle(AiAnalyzerClient $ai): int
+    public function handle(AiAnalyzerClient $ai, AiPayloadBuilder $builder): int
     {
         if (! $ai->enabled()) {
             $this->warn('AI-модуль выключен: не задан адрес.');
@@ -32,7 +34,19 @@ class AiCheck extends Command
             if ($token = config('services.ai_analyzer.token')) {
                 $http = $http->withToken($token);
             }
-            $response = $http->post($url, $this->samplePayload());
+            if ($email = $this->option('email')) {
+                $user = User::where('email', $email)->first();
+                if (! $user) {
+                    $this->error('Пользователь не найден.');
+
+                    return self::FAILURE;
+                }
+                $payload = ['user_id' => $user->id, 'timezone' => $user->timezone] + $builder->build($user);
+                $this->line('Данные: '.count($payload['days']).' дн., '.array_sum($payload['hours']).' ч фокуса по часам');
+            } else {
+                $payload = $this->samplePayload();
+            }
+            $response = $http->post($url, $payload);
         } catch (\Throwable $e) {
             $this->error('Не удалось подключиться: '.$e->getMessage());
             $this->line('Запущен ли AI-модуль? (python app.py в папке ai-module)');

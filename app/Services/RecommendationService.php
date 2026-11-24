@@ -24,6 +24,7 @@ class RecommendationService
         private StatsService $stats,
         private HabitService $habits,
         private AiAnalyzerClient $ai,
+        private AiPayloadBuilder $aiPayload,
     ) {
     }
 
@@ -262,13 +263,8 @@ class RecommendationService
             return [];
         }
 
-        $hours = array_fill(0, 24, 0.0);
-        foreach ($ctx['entries'] as $e) {
-            $h = (int) $e->started_at->copy()->setTimezone($ctx['tz'])->format('G');
-            $hours[$h] += round($this->seconds($e) / 3600, 2);
-        }
-
-        return collect($this->ai->suggest($user, ['days' => $ctx['rows'], 'hours' => $hours]))
+        // Модулю нужна длинная история (8 недель) и данные агента — собираются отдельно от правил
+        return collect($this->ai->suggest($user, $this->aiPayload->build($user)))
             ->map(fn ($s) => [
                 'rule_key' => 'ai_'.($s['key'] ?? substr(md5($s['text']), 0, 12)),
                 'type'     => $s['type'],
