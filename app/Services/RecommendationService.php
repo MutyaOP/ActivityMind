@@ -20,6 +20,20 @@ class RecommendationService
     /** Не больше столько новых советов за один запуск, чтобы не засыпать пользователя. */
     private const MAX_PER_RUN = 4;
 
+    /**
+     * Выводы AI-модуля, которые точнее одноимённых правил (8 недель вместо 14 дней, часы с делением по
+     * границам): если модуль дал такой вывод, правило в этот запуск не используется, чтобы советы не спорили.
+     */
+    private const AI_SUPERSEDES = [
+        'ai_peak_hours' => ['best_hour'],
+        'ai_late_work'  => ['late_work'],
+        'ai_trend_down' => ['trend_down', 'trend_up'],
+        'ai_trend_up'   => ['trend_down', 'trend_up'],
+    ];
+
+    /** Приоритет первого совета модуля; дальше по убыванию в порядке, который вернул модуль. */
+    private const AI_PRIORITY = 58;
+
     public function __construct(
         private StatsService $stats,
         private HabitService $habits,
@@ -52,7 +66,11 @@ class RecommendationService
     {
         $ctx = $this->context($user);
 
-        $candidates = array_merge($this->ruleCandidates($ctx), $this->aiCandidates($user, $ctx));
+        $ai = $this->aiCandidates($user, $ctx);
+        $replaced = collect($ai)->flatMap(fn ($c) => self::AI_SUPERSEDES[$c['rule_key']] ?? [])->all();
+        $rules = array_filter($this->ruleCandidates($ctx), fn ($c) => ! in_array($c['rule_key'], $replaced, true));
+
+        $candidates = array_merge($rules, $ai);
         usort($candidates, fn ($a, $b) => $b['priority'] <=> $a['priority']);
 
         $created = 0;
@@ -265,10 +283,11 @@ class RecommendationService
 
         // Модулю нужна длинная история (8 недель) и данные агента — собираются отдельно от правил
         return collect($this->ai->suggest($user, $this->aiPayload->build($user)))
-            ->map(fn ($s) => [
+            ->values()
+            ->map(fn ($s, $i) => [
                 'rule_key' => 'ai_'.($s['key'] ?? substr(md5($s['text']), 0, 12)),
                 'type'     => $s['type'],
-                'priority' => 10,
+                'priority' => self::AI_PRIORITY - $i,
                 'cooldown' => 14,
                 'text'     => $s['text'],
                 'source'   => 'ai',

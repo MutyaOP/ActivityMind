@@ -76,4 +76,4 @@ npm run build
 php artisan serve
 ```
 
-Демо-деректер: `php artisan activitymind:demo-data <email> --days=30 --fresh`. Тесттер: `php artisan test`.
+Демо-деректер: `php artisan activitymind:demo-data <email> --days=56 --fresh`. Тесттер: `php artisan test`.

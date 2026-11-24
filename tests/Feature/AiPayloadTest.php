@@ -99,6 +99,28 @@ class AiPayloadTest extends TestCase
         });
     }
 
+    public function test_ai_insights_outrank_minor_rules_and_replace_overlapping_ones(): void
+    {
+        config(['services.ai_analyzer.url' => 'http://ai.test/analyze']);
+        Http::fake(['ai.test/*' => Http::response([
+            ['key' => 'peak_hours', 'type' => 'focus', 'text' => 'Пик с 10 до 13'],
+            ['key' => 'day_clusters', 'type' => 'planning', 'text' => 'Два типа дней'],
+        ], 200)]);
+        $user = $this->user();
+        $start = now(self::TZ)->subDay()->setTime(9, 0);
+        TimeEntry::create([
+            'user_id' => $user->id, 'started_at' => $start->copy()->utc(),
+            'ended_at' => $start->copy()->addHours(4)->utc(), 'duration_sec' => 4 * 3600,
+        ]);
+
+        app(RecommendationService::class)->generate($user);
+        $keys = $user->recommendations()->pluck('rule_key')->all();
+
+        $this->assertContains('ai_peak_hours', $keys);
+        $this->assertContains('ai_day_clusters', $keys);
+        $this->assertNotContains('best_hour', $keys); // правило заменено более точным выводом модуля
+    }
+
     public function test_unreachable_module_is_not_retried_on_every_page(): void
     {
         config(['services.ai_analyzer.url' => 'http://ai.test/analyze']);

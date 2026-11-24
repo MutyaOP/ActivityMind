@@ -89,6 +89,7 @@ class AdminAccessTest extends TestCase
         $this->artisan('activitymind:demo-data', ['email' => $user->email, '--days' => 3, '--fresh' => true])->assertSuccessful();
 
         $this->assertSame(4, $user->habits()->count());
-        $this->assertSame(8, $user->tasks()->count());
+        $this->assertSame(1, $user->tasks()->where('title', 'Оформить README')->count());
+        $this->assertSame(1, \App\Models\Device::where('user_id', $user->id)->count());
     }
 }

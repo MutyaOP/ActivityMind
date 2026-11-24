@@ -8,6 +8,8 @@ from analyzer import analyze
 
 
 def main(argv: list[str]) -> int:
+    # Консоль Windows по умолчанию в cp1251: без этого падает на «R²» и других символах
+    sys.stdout.reconfigure(encoding="utf-8")
     if len(argv) != 2:
         print("Использование: python cli.py запрос.json")
         return 1

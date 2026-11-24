@@ -102,6 +102,13 @@ def _fmt(x: float, digits: int = 1) -> str:
     return f"{x:.{digits}f}".replace(".", ",")
 
 
+def _times(n: int) -> str:
+    """'1 раз', '2 раза', '5 раз', '22 раза'."""
+    if n % 10 in (2, 3, 4) and n % 100 not in (12, 13, 14):
+        return f"{n} раза"
+    return f"{n} раз"
+
+
 def _trend(df: pd.DataFrame) -> list[dict]:
     n = len(df)
     if n < MIN_DAYS_FOR_TREND:
@@ -266,7 +273,7 @@ def _agent(df: pd.DataFrame) -> list[dict]:
     if rate >= 20:
         out.append({
             "key": "frequent_switching", "type": "focus", "priority": 52,
-            "text": f"Вы переключаетесь между программами примерно {round(rate)} раз в час. Частые переключения "
+            "text": f"Вы переключаетесь между программами примерно {_times(round(rate))} в час. Частые переключения "
                     "дробят внимание: на время сессии закройте лишние окна и отключите уведомления.",
         })
 
@@ -285,7 +292,7 @@ _CLUSTER_FEATURES = {
     "habit_ratio": lambda a, b: f"выполняете {round(a * 100)}% привычек против {round(b * 100)}%",
     "tasks_done": lambda a, b: f"закрываете в среднем {_fmt(a)} задачи против {_fmt(b)}",
     "rest_share": lambda a, b: f"тратите на развлечения {round(a * 100)}% времени за компьютером против {round(b * 100)}%",
-    "switch_rate": lambda a, b: f"переключаетесь между программами {round(a)} раз в час против {round(b)}",
+    "switch_rate": lambda a, b: f"переключаетесь между программами {_times(round(a))} в час против {round(b)}",
 }
 
 
