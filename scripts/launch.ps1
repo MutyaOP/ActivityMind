@@ -4,7 +4,8 @@ param(
     [int]$Port = 8000,
     [string]$XamppDir = $(if ($env:XAMPP_DIR) { $env:XAMPP_DIR } else { 'C:\xampp' }),
     [switch]$NoBrowser,
-    [switch]$NoAgent
+    [switch]$NoAgent,
+    [switch]$Lan        # открыть сайт для телефона и других устройств в той же Wi-Fi сети
 )
 
 $Root = Split-Path -Parent $PSScriptRoot
@@ -42,6 +43,51 @@ function Start-Hidden([string]$file, [string[]]$arguments, [string]$dir, [string
         -RedirectStandardError (Join-Path $Logs "launcher-$name.err.log") | Out-Null
 }
 
+# На каких адресах слушается порт (например 127.0.0.1 или 0.0.0.0)
+function Get-ListenAddresses([int]$p) {
+    @(netstat -ano -p TCP |
+        Select-String -Pattern "^\s*TCP\s+(\S+):$p\s+\S+\s+LISTENING\s+(\d+)" |
+        ForEach-Object { [pscustomobject]@{ Address = $_.Matches[0].Groups[1].Value; ProcId = [int]$_.Matches[0].Groups[2].Value } })
+}
+
+# Останавливает «php artisan serve» на порту (и его дочерний php -S)
+function Stop-Site([int]$p) {
+    foreach ($l in Get-ListenAddresses $p) {
+        $proc = Get-CimInstance Win32_Process -Filter "ProcessId = $($l.ProcId)" -ErrorAction SilentlyContinue
+        if ($proc) {
+            $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($proc.ParentProcessId)" -ErrorAction SilentlyContinue
+            if ($parent -and $parent.CommandLine -match 'artisan') { Stop-Process -Id $parent.ProcessId -Force -ErrorAction SilentlyContinue }
+        }
+        Stop-Process -Id $l.ProcId -Force -ErrorAction SilentlyContinue
+    }
+    for ($i = 0; $i -lt 10 -and (Test-Port $p); $i++) { Start-Sleep -Milliseconds 500 }
+}
+
+# IP-адрес компьютера в домашней сети: частный адрес (192.168.x.x, 10.x.x.x, 172.16–31.x.x)
+# на физическом адаптере (Wi-Fi/Ethernet) — виртуальные адаптеры VPN пропускаются
+function Get-LanAddress {
+    $physical = @(Get-NetAdapter -Physical -ErrorAction SilentlyContinue | Where-Object Status -eq 'Up' | ForEach-Object ifIndex)
+    $addrs = @(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object {
+        $_.IPAddress -match '^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)' -and $physical -contains $_.InterfaceIndex
+    } | Sort-Object { if ($_.PrefixOrigin -eq 'Dhcp') { 0 } else { 1 } })
+    if ($addrs.Count -gt 0) { return $addrs[0].IPAddress }
+    return $null
+}
+
+# Правило брандмауэра: порт сайта открыт только для устройств из той же локальной сети
+function Confirm-FirewallRule([int]$p) {
+    $name = "ActivityMind site (TCP $p)"
+    if (Get-NetFirewallRule -DisplayName $name -ErrorAction SilentlyContinue) { Ok 'Брандмауэр: порт уже разрешён'; return }
+    Say "  Windows попросит разрешение, чтобы открыть порт $p для устройств из вашей Wi-Fi сети..."
+    $cmd = "New-NetFirewallRule -DisplayName '$name' -Direction Inbound -Protocol TCP -LocalPort $p " +
+           "-RemoteAddress LocalSubnet -Action Allow -Profile Any | Out-Null"
+    try {
+        Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList @('-NoProfile', '-Command', $cmd)
+    } catch { }
+    if (Get-NetFirewallRule -DisplayName $name -ErrorAction SilentlyContinue) { Ok "Брандмауэр: порт $p разрешён для локальной сети" }
+    else { Skip 'Брандмауэр: разрешение не получено — другие устройства, скорее всего, не смогут открыть сайт' }
+}
+
 Say ''
 Say '  ActivityMind' 'Yellow'
 Say ''
@@ -76,10 +122,15 @@ else {
 }
 
 # --- 3. Сайт ---
+$bindHost = if ($Lan) { '0.0.0.0' } else { '127.0.0.1' }
+if ($Lan -and (Test-Port $Port) -and -not (Get-ListenAddresses $Port | Where-Object { $_.Address -eq '0.0.0.0' })) {
+    Say '  Сайт работает только для этого компьютера — перезапускаю его для Wi-Fi сети...'
+    Stop-Site $Port
+}
 if (Test-Port $Port) {
     Ok "Сайт уже работает: $Url"
 } else {
-    Start-Hidden 'php' @('artisan', 'serve', "--port=$Port") $Root 'server'
+    Start-Hidden 'php' @('artisan', 'serve', "--host=$bindHost", "--port=$Port") $Root 'server'
     if (Wait-Port $Port 20) { Ok "Сайт запущен: $Url" }
     else { Fail 'Сайт не запустился. Подробности: storage\logs\launcher-server.err.log' }
 }
@@ -113,6 +164,18 @@ if ($NoAgent) {
 Say ''
 if ($NoBrowser) { Say "  Готово. Сайт: $Url" 'Yellow' }
 else { Start-Process $Url; Say "  Готово. Сайт открыт в браузере: $Url" 'Yellow' }
+if ($Lan) {
+    Confirm-FirewallRule $Port
+    $ip = Get-LanAddress
+    Say ''
+    if ($ip) {
+        Say "  С телефона или другого ноутбука в той же Wi-Fi сети откройте:" 'Yellow'
+        Say "      http://${ip}:$Port" 'Cyan'
+    } else {
+        Say '  Не удалось определить адрес в сети — посмотрите IPv4-адрес командой ipconfig.' 'Red'
+    }
+}
 Say '  Остановить всё: ActivityMind-stop.cmd' 'DarkGray'
-Start-Sleep -Seconds 4
+if ($Lan) { Say ''; Read-Host '  Нажмите Enter, чтобы закрыть это окно (сайт продолжит работать)' | Out-Null }
+else { Start-Sleep -Seconds 4 }
 exit 0
