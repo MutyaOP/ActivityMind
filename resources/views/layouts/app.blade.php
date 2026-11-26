@@ -15,7 +15,6 @@
         [__('Активность'),   'activity.index',        'clock'],
         [__('Рекомендации'), 'recommendations.index', 'bulb'],
         [__('Устройства'), 'devices.index',         'device'],
-        [__('Настройки'),  'settings.edit',         'sliders'],
     ];
     $unreadCount  = $user->recommendations()->where('is_read', false)->count();
     $timerRunning = $user->timeEntries()->running()->exists();
@@ -62,8 +61,14 @@
             @endif
         </nav>
 
+        {{-- Настройки — над аккаунтом --}}
+        <a href="{{ route('settings.edit') }}" class="mt-4 {{ $linkBase }} {{ $isActive('settings.edit') ? $linkOn : $linkOff }}">
+            <x-icon name="gear" class="h-[18px] w-[18px] shrink-0 {{ $isActive('settings.edit') ? 'text-slate-200' : 'text-slate-500 group-hover:text-slate-300' }}" />
+            <span class="flex-1">{{ __('Настройки') }}</span>
+        </a>
+
         {{-- Профиль внизу меню --}}
-        <div class="mt-4 flex items-center gap-2.5 border-t border-white/[0.06] px-1 pt-4">
+        <div class="mt-2 flex items-center gap-2.5 border-t border-white/[0.06] px-1 pt-3">
             <a href="{{ route('profile.edit') }}" class="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-white/[0.04]">
                 <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface-700 text-sm text-slate-200">
                     {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
